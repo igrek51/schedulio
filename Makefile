@@ -8,6 +8,7 @@ setup:
 	python setup.py develop
 	@echo Activate your venv: . venv/bin/activate
 
+
 build:
 	COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yaml build
 
@@ -18,5 +19,21 @@ run-docker: build
 	docker-compose up
 	docker-compose rm -f schedulio
 
-run:
+run-django:
+	python -u schedulio/djangoapp/manage.py runserver 0.0.0.0:8000 --noreload
+
+run-fastapi:
 	python -m schedulio run
+
+run: run-fastapi
+
+
+recreate-db:
+	rm -f db/schedulio.sqlite
+	python schedulio/djangoapp/manage.py makemigrations djangoapp
+	python schedulio/djangoapp/manage.py migrate
+	python schedulio/djangoapp/manage.py createsuperuser
+
+add-migration:
+	python schedulio/djangoapp/manage.py makemigrations djangoapp
+	python schedulio/djangoapp/manage.py migrate
