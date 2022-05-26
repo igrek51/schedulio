@@ -1,0 +1,13 @@
+version: '3'
+services:
+
+  schedulio:
+    build: .
+    image: schedulio
+    container_name: schedulio
+    restart: unless-stopped
+    user: '1000'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./.volumes/db:/src/schedulio/db

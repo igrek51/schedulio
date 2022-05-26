@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schedulio</title>
+    <link href="{{ url_for('static', path='/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/schedulio.css') }}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+</head>
+<body class="d-flex flex-column h-100">
+<main>
+
+    <div id="alerts-placeholder"></div>
+
+    {% block content %}{% endblock %}
+
+</main>
+
+<script src="{{ url_for('static', path='/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', path='/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', path='/schedulio.js') }}"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>
