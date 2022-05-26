@@ -1,17 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+from asgiref.sync import sync_to_async
+from django.forms.models import model_to_dict
 
-from schedulio.api.database import SessionLocal
-from schedulio.api import crud
-from schedulio.api import schemas
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from schedulio.api.endpoint import schemas
+from schedulio.api.endpoint.database import create_new_schedule, find_schedule_by_id
+from schedulio.djangoapp import models
+from schedulio.djangoapp.time import datetime_to_timestamp
 
 
 def setup_endpoints(app: FastAPI):
@@ -21,13 +15,23 @@ def setup_endpoints(app: FastAPI):
         return {'status': 'ok'}
 
 
-    @app.post("/schedule/", response_model=schemas.Schedule)
-    def create_schedule(schedule: schemas.ScheduleCreate, db: Session = Depends(get_db)):
-        return crud.create_schedule(db=db, schedule=schedule)
+    @app.post("/api/schedule", response_model=schemas.Schedule)
+    async def create_schedule(schedule: schemas.ScheduleCreate):
+        return await _create_schedule(schedule)
 
-    @app.get("/schedule/{schedule_id}", response_model=schemas.Schedule)
-    def read_schedule(schedule_id: str, db: Session = Depends(get_db)):
-        db_model = crud.get_schedule(db, schedule_id=schedule_id)
-        if db_model is None:
-            raise HTTPException(status_code=404, detail="Schedule not found")
-        return db_model
+    @app.get("/api/schedule/{id}", response_model=schemas.Schedule)
+    async def get_schedule(id: str):
+        return await _get_schedule(id)
+
+
+@sync_to_async
+def _create_schedule(schedule: schemas.ScheduleCreate):
+    model = create_new_schedule(schedule.title, schedule.description)
+    model_dict = model_to_dict(model)
+    model_dict['create_time'] = datetime_to_timestamp(model_dict['create_time'])
+    return model_dict
+
+
+@sync_to_async
+def _get_schedule(id: str) -> models.Schedule:
+    return find_schedule_by_id(id)
