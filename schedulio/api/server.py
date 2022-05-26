@@ -8,7 +8,7 @@ from schedulio.api import models
 from schedulio.api.endpoint.endpoints import setup_endpoints
 
 from schedulio.api.views import setup_web_views
-from .database import SessionLocal, engine
+from .database import engine
 
 
 def run_server():
@@ -20,9 +20,8 @@ def run_server():
 
 
 def creat_fastapi_app() -> FastAPI:
-
     models.Base.metadata.create_all(bind=engine)
-    
+
     app = FastAPI()
     app.add_middleware(
         CORSMiddleware,
