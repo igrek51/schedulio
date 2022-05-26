@@ -11,7 +11,7 @@ COPY schedulio/. /src/schedulio/schedulio/
 RUN cd /src/schedulio && python setup.py develop
 
 ENV DEBUG false
-ENV DJANGO_SETTINGS_MODULE "schedulio.djangoapp.app.settings"
+ENV DJANGO_SETTINGS_MODULE "schedulio.djangoapp.settings"
 CMD python -u schedulio/main.py
 
 EXPOSE 8000

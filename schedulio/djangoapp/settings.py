@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.environ.get('DEBUG', 'true').lower() in {'true', 'yes', 'y', '1'}
 
-SECRET_KEY = 'x&y+a!&t&d3y+*!igjtgrf_^&h&kj=(+)fuv9(a#qa1+fe$r9d'
+SECRET_KEY = 'x&y+a!&t&d3y+*!igjtgrf_^&h&kj=(+)fuv9(a#qa1+ge$r0e'
 
 ALLOWED_HOSTS = ['*']
 
@@ -55,21 +55,6 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
 
 LANGUAGE_CODE = 'en-us'
 
@@ -80,3 +65,5 @@ USE_I18N = True
 USE_L10N = True
 
 STATIC_URL = '/static/'
+
+LOGIN_URL = '/admin/login/'
