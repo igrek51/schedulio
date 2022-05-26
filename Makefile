@@ -19,4 +19,4 @@ run-docker: build
 	docker-compose rm -f schedulio
 
 run:
-	python -u schedulio/main.py run
+	python -m schedulio run
