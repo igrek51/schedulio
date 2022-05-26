@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1>Schedulio</h1>
-    <h2>New Schedule</h2>
+<div class="container mt-3">
+    <h2>Schedule</h2>
 
     <div id="scheduleTable"></div>
+
+    <div class="mt-3">
+        <button type="button" class="btn btn-success" id="btn-answer-ok">OK</button>
+        <button type="button" class="btn btn-light" id="btn-answer-maybe">Maybe</button>
+        <button type="button" class="btn btn-danger" id="btn-answer-no">No</button>
+        <div class="input-group mb-4">
+            <span class="input-group-text">From-To hours:</span>
+            <input type="text" class="form-control" placeholder="Hours" id="input-answer-hours" value="">
+            <button class="btn btn-warning" type="button" id="btn-answer-hours">Set</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
