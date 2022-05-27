@@ -151,3 +151,13 @@ function setSelectedCells(value) {
     hot.render()
     hot.resumeRender()
 }
+
+$('[data-bs-toggle="tooltip"]').each(function(i, obj) {
+    new bootstrap.Tooltip(obj)
+})
+
+$(document).ready(function() {
+    ajaxRequest('get', `/api/schedule/${scheduleId}/votes`, function(data) {
+        console.log(data)
+    })
+})

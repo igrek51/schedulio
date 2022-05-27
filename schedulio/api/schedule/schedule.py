@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Dict, List, Tuple
 from collections import defaultdict
 
@@ -14,7 +15,9 @@ from schedulio.api.schedule.database import (
     list_votes_by_schedule, trim_old_votes, update_guest, 
     update_guest_last_update, update_schedule,
 )
-from schedulio.djangoapp.time import datetime_to_timestamp, round_timestamp_to_day, timestamp_to_datetime, today_timestamp
+from schedulio.api.schedule.time import datetime_to_timestamp, round_timestamp_to_day, timestamp_to_datetime, today_timestamp
+
+spare_schedule_days_num = 14
 
 
 def get_schedule_schema(schedule_id: str):
@@ -48,9 +51,10 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
         if day > max_day:
             max_day = day
         day_to_guest_to_vote[day][guest_id] = vote_answer
+    max_date = timestamp_to_datetime(max_day) + timedelta(days=spare_schedule_days_num)
     
     day_votes: List[schemas.DayVotes] = []
-    for day_index, day_date in days_range(min_timestamp=today, max_timestamp=max_day):
+    for day_index, day_date in days_range(min_timestamp=today, max_date=max_date):
         guest_votes: Dict[str, str] = {}
         for guest_id, vote_answer in day_to_guest_to_vote[day_index].items():
             guest_votes[guest_id] = vote_answer

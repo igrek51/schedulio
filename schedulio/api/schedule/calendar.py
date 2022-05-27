@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Iterable, List, Tuple
 
 from schedulio.api.schedule import schemas
-from schedulio.djangoapp.time import datetime_to_timestamp, timestamp_to_datetime
+from schedulio.api.schedule.time import datetime_to_timestamp, timestamp_to_datetime
 
 days_of_week_names = {
     0: 'Sun',

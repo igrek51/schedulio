@@ -6,14 +6,19 @@
 
     <div class="btn-toolbar mt-3 mb-3">
         <div class="btn-group">
-            <button type="button" class="btn btn-success" id="btn-answer-ok">OK</button>
-            <button type="button" class="btn btn-outline-secondary" id="btn-answer-maybe">Maybe</button>
-            <button type="button" class="btn btn-danger" id="btn-answer-no">No</button>
+            <button type="button" class="btn btn-success" id="btn-answer-ok" 
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Vote for 'OK' in selected days">OK</button>
+            <button type="button" class="btn btn-outline-secondary" id="btn-answer-maybe"
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Vote for 'Maybe' (empty cell) in selected days">Maybe</button>
+            <button type="button" class="btn btn-danger" id="btn-answer-no"
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Vote for 'I can't' in selected columns">No</button>
         </div>
         <div class="btn-group ms-2">
             <div class="input-group">
-                <button class="btn btn-warning" type="button" id="btn-answer-hours">Set hours:</button>
-                <input type="text" class="form-control" placeholder="From hour - To hour" id="input-answer-hours" value="">
+                <button class="btn btn-warning" type="button" id="btn-answer-hours"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Set matching hours in selected days">Set hours:</button>
+                <input type="text" class="form-control" placeholder="From hour - To hour" id="input-answer-hours" value="18-24"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Type hours in 'HH-HH' format or 'HH:MM - HH:MM'">
             </div>
         </div>
     </div>
@@ -28,5 +33,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+let scheduleId = '{{ schedule.id }}'
+</script>
 <script src="{{ url_for('static', path='/schedulio.new.js') }}"></script>
 {% endblock %}

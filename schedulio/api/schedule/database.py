@@ -5,7 +5,7 @@ from nuclear.sublog import log
 from schedulio.api.errors import EntityNotFound
 from schedulio.api.schedule import schemas
 from schedulio.djangoapp import models
-from schedulio.djangoapp.time import now_timestamp
+from schedulio.api.schedule.time import now_timestamp
 
 
 def find_schedule_by_id(id: str) -> models.Schedule:
