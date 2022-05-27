@@ -14,14 +14,10 @@ def setup_endpoints(app: FastAPI):
 
     @app.post("/api/schedule", response_model=schemas.Schedule)
     def create_schedule(schedule: schemas.ScheduleCreate):
-        return _create_schedule(schedule)
-
-    @app.get("/api/schedule/{id}", response_model=schemas.Schedule)
-    def get_schedule(id: str):
-        model = find_schedule_by_id(id)
+        model = create_new_schedule(schedule.title, schedule.description)
         return schedule_model_to_schema(model)
 
-
-def _create_schedule(schedule: schemas.ScheduleCreate):
-    model = create_new_schedule(schedule.title, schedule.description)
-    return schedule_model_to_schema(model)
+    @app.get("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
+    def get_schedule(schedule_id: str):
+        model = find_schedule_by_id(schedule_id)
+        return schedule_model_to_schema(model)

@@ -11,3 +11,7 @@ def now() -> datetime:
 def datetime_to_timestamp(dt: datetime) -> int:
     """Convert datetime.datetime to integer timestamp in seconds"""
     return int(dt.timestamp())
+
+
+def now_timestamp() -> int:
+    return datetime_to_timestamp(now())
