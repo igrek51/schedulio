@@ -1,5 +1,4 @@
-from django.forms.models import model_to_dict
-
+from typing import List
 from schedulio.api.endpoint import schemas
 from schedulio.djangoapp import models
 
@@ -30,3 +29,11 @@ def vote_model_to_schema(model: models.Vote) -> schemas.Vote:
         day=model.day,
         answer=model.answer,
     )
+
+
+def guests_model_to_schema(models: List[models.Guest]) -> List[schemas.Guest]:
+    return [guest_model_to_schema(model) for model in models]
+
+
+def votes_model_to_schema(models: List[models.Vote]) -> List[schemas.Vote]:
+    return [vote_model_to_schema(model) for model in models]

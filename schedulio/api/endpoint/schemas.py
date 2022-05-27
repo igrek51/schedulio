@@ -16,7 +16,6 @@ class Schedule(BaseModel):
 
 
 class GuestCreate(BaseModel):
-    schedule_id: str
     name: str
 
 
@@ -28,11 +27,16 @@ class Guest(BaseModel):
     last_update: int
 
 
+class GuestUpdate(BaseModel):
+    name: str
+
+
 class Vote(BaseModel):
     guest_id: str
     day: int
     answer: str
 
 
-class VoteBatch(BaseModel):
-    votes: List[Vote]
+class VoteUpdate(BaseModel):
+    day: int
+    answer: str

@@ -45,16 +45,16 @@ def find_guest_by_id(id: str) -> models.Guest:
         raise EntityNotFound(f'Guest with id {id} was not found')
 
 
-def create_new_guest(schedule: models.Schedule, name: str) -> models.Guest:
+def create_new_guest(schedule: models.Schedule, guest: schemas.GuestCreate) -> models.Guest:
     new_model = models.Guest(
         schedule=schedule,
-        name=name,
+        name=guest.name,
     )
     new_model.save()
     return new_model
 
 
-def update_guest_name(guest: models.Guest, name: str):
+def update_guest(guest: models.Guest, name: str):
     guest.name = name
     guest.save()
 
@@ -95,6 +95,7 @@ def create_or_update_vote(guest: models.Guest, day: int, answer: str) -> models.
     except models.Vote.DoesNotExist:
         new_vote = models.Vote(
             guest=guest,
+            schedule=guest.schedule,
             day=day,
             answer=answer,
         )
