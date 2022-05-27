@@ -1,5 +1,5 @@
 from typing import List
-from schedulio.api.endpoint import schemas
+from schedulio.api.schedule import schemas
 from schedulio.djangoapp import models
 
 
@@ -25,7 +25,6 @@ def guest_model_to_schema(model: models.Guest) -> schemas.Guest:
 
 def vote_model_to_schema(model: models.Vote) -> schemas.Vote:
     return schemas.Vote(
-        guest_id=model.guest.id,
         day=model.day,
         answer=model.answer,
     )

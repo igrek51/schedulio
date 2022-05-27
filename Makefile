@@ -4,7 +4,7 @@ setup:
 	python3.8 -m venv venv &&\
 	. venv/bin/activate &&\
 	pip install --upgrade pip setuptools &&\
-	pip install -r requirements.txt &&\
+	pip install -r requirements.txt -r requirements-dev.txt &&\
 	python setup.py develop
 	@echo Activate your venv: . venv/bin/activate
 
@@ -27,6 +27,9 @@ run-fastapi:
 
 run: run-fastapi
 
+test:
+	cd tests &&\
+	python -m pytest -vv --tb=short -ra $(test)
 
 recreate-db:
 	rm -f db/schedulio.sqlite

@@ -6,7 +6,7 @@ from nuclear.sublog import log, log_exception
 
 from schedulio.djangoapp.asgi import application as django_app
 from schedulio.api.dispatcher import AsgiDispatcher
-from schedulio.api.endpoint.endpoints import setup_endpoints
+from schedulio.api.schedule.endpoints import setup_endpoints
 from schedulio.api.errors import EntityNotFound
 from schedulio.api.views import setup_web_views
 

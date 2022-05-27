@@ -1,7 +1,9 @@
 from typing import List, Optional
 
+from nuclear.sublog import log
+
 from schedulio.api.errors import EntityNotFound
-from schedulio.api.endpoint import schemas
+from schedulio.api.schedule import schemas
 from schedulio.djangoapp import models
 from schedulio.djangoapp.time import now_timestamp
 
@@ -101,3 +103,10 @@ def create_or_update_vote(guest: models.Guest, day: int, answer: str) -> models.
         )
         new_vote.save()
         return new_vote
+
+
+def trim_old_votes(older_than: int) -> models.Vote:
+    queryset = models.Vote.objects.filter(day__lt=older_than)
+    deleted_rows = queryset.delete()[0]
+    if deleted_rows:
+        log.debug(f'Old votes trimmed', deleted_rows=deleted_rows, today_timestamp=older_than)

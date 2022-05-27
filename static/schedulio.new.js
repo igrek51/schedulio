@@ -33,7 +33,14 @@ function celRenderer(instance, td, row, col, prop, value, cellProperties) {
     }
 }
 
-var loadMoreData = function(n) {
+function afterSelection(row, column, row2, column2, preventScrolling, selectionLayerLevel) {
+    lastRow = hot.countRows() - 1
+    if (row == lastRow || row2 == lastRow) {
+        loadMoreData(7)
+    }
+}
+
+function loadMoreData(n) {
     for (let i = 0; i < n; i += 1) {
         data.push(['Sat 2022-05-27', '', '', '', ''])
     }
@@ -47,7 +54,7 @@ const hot = new Handsontable(container, {
     rowHeaders: false,
     colHeaders: false,
     width: 'auto',
-    height: '20vw',
+    height: 'auto',
     colWidths(index) {
         if (index == 0) {
             return 150
@@ -98,13 +105,8 @@ const hot = new Handsontable(container, {
     },
     outsideClickDeselects: false,
     selectionMode: 'multiple',
+    afterSelection: afterSelection,
     licenseKey: 'non-commercial-and-evaluation',
-})
-
-
-$("#btn-more-days").click(function () {
-    loadMoreData(7)
-    hot.scrollViewportTo(hot.countRows() - 1)
 })
 
 $("#btn-answer-ok").click(function () {

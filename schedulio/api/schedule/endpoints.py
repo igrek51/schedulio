@@ -1,33 +1,33 @@
 from typing import List
 from fastapi import FastAPI
 
-from schedulio.api.endpoint import schemas
-from schedulio.api.endpoint.converters import (
-    guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, vote_model_to_schema, 
-    votes_model_to_schema,
+from schedulio.api.schedule import schemas
+from schedulio.api.schedule.converters import (
+    guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, 
 )
-from schedulio.api.endpoint.database import (
-    create_new_guest, create_new_schedule, create_or_update_vote, find_guest_by_id, find_schedule_by_id, 
-    list_guests_by_schedule, list_votes_by_guest, update_guest, update_guest_last_update, update_schedule,
+from schedulio.api.schedule.database import (
+    create_new_guest, create_new_schedule, find_guest_by_id, find_schedule_by_id, 
+    list_guests_by_schedule, update_guest, update_schedule,
 )
+from schedulio.api.schedule.schedule import get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, send_multiple_guest_votes
+from schedulio.api.schedule.calendar import get_more_votes
 
 
 def setup_endpoints(app: FastAPI):
 
     @app.get("/api/status")
-    async def get_status():
+    async def _get_server_status():
         return {'status': 'ok'}
 
 
     @app.post("/api/schedule", response_model=schemas.Schedule)
-    def create_schedule(schedule: schemas.ScheduleCreate):
+    def _create_schedule(schedule: schemas.ScheduleCreate):
         schedule_model = create_new_schedule(schedule)
         return schedule_model_to_schema(schedule_model)
 
     @app.get("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
-    def get_schedule(schedule_id: str):
-        schedule_model = find_schedule_by_id(schedule_id)
-        return schedule_model_to_schema(schedule_model)
+    def _get_schedule(schedule_id: str):
+        return get_schedule_schema(schedule_id)
 
     @app.put("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
     def _update_schedule(schedule_id: str, schedule: schemas.Schedule):
@@ -37,18 +37,18 @@ def setup_endpoints(app: FastAPI):
 
 
     @app.get("/api/schedule/{schedule_id}/guest", response_model=List[schemas.Guest])
-    def list_schedule_guests(schedule_id: str):
+    def _list_schedule_guests(schedule_id: str):
         guest_models = list_guests_by_schedule(schedule_id)
         return guests_model_to_schema(guest_models)
 
     @app.post("/api/schedule/{schedule_id}/guest", response_model=schemas.Guest)
-    def create_guest(schedule_id: str, guest: schemas.GuestCreate):
+    def _create_guest(schedule_id: str, guest: schemas.GuestCreate):
         schedule_model = find_schedule_by_id(schedule_id)
         guest_model = create_new_guest(schedule_model, guest)
         return guest_model_to_schema(guest_model)
 
     @app.get("/api/guest/{guest_id}", response_model=schemas.Guest)
-    def get_guest(guest_id: str):
+    def _get_guest(guest_id: str):
         guest_model = find_guest_by_id(guest_id)
         return guest_model_to_schema(guest_model)
 
@@ -59,22 +59,22 @@ def setup_endpoints(app: FastAPI):
         return guest_model_to_schema(guest_model)
 
 
-    @app.get("/api/guest/{guest_id}/vote", response_model=List[schemas.Vote])
-    def get_guest_votes(guest_id: str):
-        guest_model = find_guest_by_id(guest_id)
-        votes = list_votes_by_guest(guest_model)
-        return votes_model_to_schema(votes)
+    @app.get("/api/guest/{guest_id}/votes", response_model=List[schemas.Vote])
+    def _get_guest_votes(guest_id: str):
+        return get_guest_votes(guest_id)
 
     @app.post("/api/guest/{guest_id}/vote", response_model=schemas.Vote)
-    def send_guest_vote(guest_id: str, vote: schemas.VoteUpdate):
-        guest_model = find_guest_by_id(guest_id)
-        vote_model = create_or_update_vote(guest_model, vote.day, vote.answer)
-        update_guest_last_update(guest_model)
-        return vote_model_to_schema(vote_model)
+    def _send_guest_vote(guest_id: str, vote: schemas.Vote):
+        return send_guest_vote(guest_id, vote)
 
     @app.post("/api/guest/{guest_id}/votes")
-    def send_guest_votes(guest_id: str, votes: List[schemas.VoteUpdate]):
-        guest_model = find_guest_by_id(guest_id)
-        for vote in votes:
-            create_or_update_vote(guest_model, vote.day, vote.answer)
-        update_guest_last_update(guest_model)
+    def _send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
+        send_multiple_guest_votes(guest_id, votes)
+
+    @app.get("/api/schedule/{schedule_id}/votes", response_model=schemas.DayVotesBatch)
+    def _get_schedule_votes(schedule_id: str):
+        return get_schedule_votes(schedule_id)
+
+    @app.get("/api/schedule/{schedule_id}/votes/more/{after_day}", response_model=schemas.DayVotesBatch)
+    def _get_more_schedule_votes(schedule_id: str, after_day: int):
+        return get_more_votes(after_day)

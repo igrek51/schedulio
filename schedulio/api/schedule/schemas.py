@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 from pydantic import BaseModel
 
 
@@ -32,11 +32,16 @@ class GuestUpdate(BaseModel):
 
 
 class Vote(BaseModel):
-    guest_id: str
     day: int
     answer: str
 
 
-class VoteUpdate(BaseModel):
-    day: int
-    answer: str
+class DayVotes(BaseModel):
+    day_index: int
+    day_name: str
+    day_of_week: int
+    guest_votes: Dict[str, str]  # guest_id -> vote answer
+
+
+class DayVotesBatch(BaseModel):
+    day_votes: List[DayVotes]
