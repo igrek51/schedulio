@@ -38,14 +38,15 @@ function afterSelection(row, column, row2, column2, preventScrolling, selectionL
 function afterSetDataAtCell(changes) {
     if (changes) {
         const lastCol = hot.countCols() - 1
+        const lastRow = hot.countRows() - 1
         const voteChanges = []
-        changes.forEach(([row, prop, oldValue, newValue]) => {
-            if (row == 0) {
-                if (prop == lastCol && newValue != '...' && newValue != '') {
-                    addNewGuest(newValue)
-                }
-            } else {
-                voteChanges.push([row, prop, newValue])
+        changes.forEach(([row, col, oldValue, newValue]) => {
+            if (row == 0 && col == lastCol && newValue != '...' && newValue) {
+                addNewGuest(newValue)
+            } else if (row > 0 && row < lastRow && col > 0 && col < lastCol) {
+                voteChanges.push([row, col, newValue])
+            } else if (row == 0 && col > 0 && col < lastCol) {
+                renameGuest(col - 1, newValue)
             }
         })
         if (voteChanges.length > 0) {
@@ -146,9 +147,9 @@ function setSelectedCells(value) {
 
     for (let index = 0; index < selected.length; index += 1) {
         const [row1, column1, row2, column2] = selected[index]
-        const startRow = Math.max(Math.min(row1, row2, lastRow), 1)
+        const startRow = Math.max(Math.min(row1, row2), 1)
         const endRow = Math.min(Math.max(row1, row2), lastRow)
-        const startCol = Math.max(Math.min(column1, column2, lastCol), 1)
+        const startCol = Math.max(Math.min(column1, column2), 1)
         const endCol = Math.min(Math.max(column1, column2), lastCol)
 
         for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
@@ -169,6 +170,8 @@ $('[data-bs-toggle="tooltip"]').each(function(i, obj) {
 
 let dayVotes = []
 let guests = []
+let guestsById = {}
+let guestIdToIndex = {}
 
 $(document).ready(function() {
     ajaxRequest('get', `/api/schedule/${scheduleId}`, function(data) {
@@ -177,6 +180,10 @@ $(document).ready(function() {
     
     ajaxRequest('get', `/api/schedule/${scheduleId}/guest`, function(data) {
         guests = data
+        guests.forEach(function (guest, i) {
+            guestsById[guest.id] = guest
+            guestIdToIndex[guest.id] = i
+        })
         refreshAllVotes()
     })
 
@@ -195,14 +202,21 @@ function refreshAllVotes() {
         headerRow.push(guest.name)
     }
     headerRow.push('...')
-    let guestColumns = Array(guests.length + 1).fill('')
+    let guestEmptyColumns = Array(guestsNum + 1).fill('')
 
     tableData = [headerRow]
     for (const dayVote of dayVotes) {
-        const row = [dayVote.day_name].concat(guestColumns)
+
+        let guestCells = Array(guestsNum + 1).fill('')
+        for (const [guestId, answer] of Object.entries(dayVote.guest_votes)) {
+            const guestIndex = guestIdToIndex[guestId]
+            guestCells[guestIndex] = answer
+        }
+
+        const row = [dayVote.day_name].concat(guestCells)
         tableData.push(row)
     }
-    tableData.push(['...'].concat(guestColumns))
+    tableData.push(['...'].concat(guestEmptyColumns))
 
     hot.updateData(tableData)
     hot.render()
@@ -230,6 +244,10 @@ function loadMoreVotes() {
 function addNewGuest(name) {
     ajaxPayloadRequest('post', `/api/schedule/${scheduleId}/guest`, {'name': name}, function(data) {
         guests.push(data)
+        guests.forEach(function (guest, i) {
+            guestsById[guest.id] = guest
+            guestIdToIndex[guest.id] = i
+        })
         console.log('new guest created:', name)
         refreshAllVotes()
     })
@@ -248,8 +266,8 @@ function sendVotes(voteChanges) {
     let votes = []
     let guestId = 0
 
-    voteChanges.forEach(([row, prop, newValue]) => {
-        const guest = getGuestByColumn(prop)
+    voteChanges.forEach(([row, col, newValue]) => {
+        const guest = getGuestByColumn(col)
         if (guestId == 0) {
             guestId = guest.id
         } else if (guestId != guest.id) {
@@ -257,6 +275,9 @@ function sendVotes(voteChanges) {
         }
 
         let answer = newValue
+        if (!answer) {
+            answer = ''
+        }
         const day = getDayTimestampByRow(row)
 
         votes.push({
@@ -266,6 +287,14 @@ function sendVotes(voteChanges) {
     })
 
     ajaxPayloadRequest('post', `/api/guest/${guestId}/votes`, votes, function(data) {
-        console.log(`${votes.length} votes sent, guest: ${guestId}`)
+        console.log(`${votes.length} votes sent for guest: ${guestId}`)
+    })
+}
+
+function renameGuest(guestIndex, newName) {
+    const guest = guests[guestIndex]
+    ajaxPayloadRequest('put', `/api/guest/${guest.id}`, {name: newName}, function(data) {
+        guest.name = newName
+        console.log(`Guest renamed to ${newName}`)
     })
 }
