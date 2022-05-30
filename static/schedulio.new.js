@@ -31,16 +31,8 @@ function celRenderer(instance, td, row, col, prop, value, cellProperties) {
 function afterSelection(row, column, row2, column2, preventScrolling, selectionLayerLevel) {
     lastRow = hot.countRows() - 1
     if (row == lastRow || row2 == lastRow) {
-        loadMoreData(7)
+        loadMoreVotes()
     }
-}
-
-function loadMoreData(n) {
-    for (let i = 0; i < n; i += 1) {
-        tableData.push(['Sat 2022-05-27', '', '', '', ''])
-    }
-    hot.updateData(tableData)
-    hot.render()
 }
 
 const container = document.getElementById('scheduleTable')
@@ -159,20 +151,20 @@ $(document).ready(function() {
     })
 
     ajaxRequest('get', `/api/schedule/${scheduleId}/votes`, function(data) {
-        dayVotes = data
-        refreshVotes()
+        dayVotes = data.day_votes
+        refreshAllVotes()
     })
 })
 
-function refreshVotes() {
+function refreshAllVotes() {
     hot.suspendRender()
 
     tableData = [
         ['Day', 'Alice', 'Bob', 'Charlie', '...'],
     ]
 
-    for (let i = 0; i < dayVotes.day_votes.length; i += 1) {
-        const dayVote = dayVotes.day_votes[i]
+    for (let i = 0; i < dayVotes.length; i += 1) {
+        const dayVote = dayVotes[i]
         tableData.push([dayVote.day_name, '', '', '', ''])
     }
     tableData.push(['...', '', '', '', ''])
@@ -180,4 +172,22 @@ function refreshVotes() {
     hot.updateData(tableData)
     hot.render()
     hot.resumeRender()
+}
+
+function loadMoreVotes() {
+    lastDay = dayVotes[dayVotes.length - 1].day_timestamp
+    ajaxRequest('get', `/api/schedule/${scheduleId}/votes/more/${lastDay}`, function(data) {
+
+        batchVotes = data.day_votes
+        tableData.pop()
+        for (let i = 0; i < batchVotes.length; i += 1) {
+            const dayVote = batchVotes[i]
+            dayVotes.push(dayVote)
+            tableData.push([dayVote.day_name, '', '', '', ''])
+        }
+        tableData.push(['...', '', '', '', ''])
+
+        hot.updateData(tableData)
+        hot.render()
+    })
 }

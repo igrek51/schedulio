@@ -25,7 +25,7 @@ class Guest(models.Model):
 
     id = models.CharField(max_length=36, primary_key=True, default=new_uuid)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, db_index=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     create_time = models.IntegerField(default=now_timestamp)
     last_update = models.IntegerField(default=now_timestamp)
 
