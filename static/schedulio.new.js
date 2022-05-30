@@ -1,5 +1,5 @@
 let tableData = [
-    ['Day', '...'],
+    ['Day', ''],
 ]
 
 function celRenderer(instance, td, row, col, prop, value, cellProperties) {
@@ -8,6 +8,9 @@ function celRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.style.color = '#000000'
         td.style.background = '#F8F9FA'
         td.style.fontWeight = 'bold'
+        if (col == instance.countCols() - 1) {
+            td.innerHTML = '<u>Name</u>'
+        }
     } else if (col == 0) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'
@@ -41,7 +44,7 @@ function afterSetDataAtCell(changes) {
         const lastRow = hot.countRows() - 1
         const voteChanges = []
         changes.forEach(([row, col, oldValue, newValue]) => {
-            if (row == 0 && col == lastCol && newValue != '...' && newValue) {
+            if (row == 0 && col == lastCol && newValue) {
                 addNewGuest(newValue)
             } else if (row > 0 && row < lastRow && col > 0 && col < lastCol) {
                 voteChanges.push([row, col, newValue])
@@ -201,7 +204,7 @@ function refreshAllVotes() {
     for (const guest of guests) {
         headerRow.push(guest.name)
     }
-    headerRow.push('...')
+    headerRow.push('<u>Add</u>')
     let guestEmptyColumns = Array(guestsNum + 1).fill('')
 
     tableData = [headerRow]
@@ -227,14 +230,17 @@ function loadMoreVotes() {
     lastDay = dayVotes[dayVotes.length - 1].day_timestamp
     ajaxRequest('get', `/api/schedule/${scheduleId}/votes/more/${lastDay}`, function(data) {
 
+        let guestsNum = guests.length
+        let guestEmptyColumns = Array(guestsNum + 1).fill('')
+
         batchVotes = data.day_votes
         tableData.pop()
         for (let i = 0; i < batchVotes.length; i += 1) {
             const dayVote = batchVotes[i]
             dayVotes.push(dayVote)
-            tableData.push([dayVote.day_name, '', '', '', ''])
+            tableData.push([dayVote.day_name].concat(guestEmptyColumns))
         }
-        tableData.push(['...', '', '', '', ''])
+        tableData.push(['...'].concat(guestEmptyColumns))
 
         hot.updateData(tableData)
         hot.render()
