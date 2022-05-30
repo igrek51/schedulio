@@ -84,7 +84,7 @@ def send_guest_vote(guest_id: str, vote: schemas.Vote) -> schemas.Vote:
 
 def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
     guest_model = find_guest_by_id(guest_id)
-    day_timestamp = round_timestamp_to_day(vote.day)
     for vote in votes:
+        day_timestamp = round_timestamp_to_day(vote.day)
         create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)

@@ -13,7 +13,7 @@ def setup_web_views(app: FastAPI):
 
     @app.get("/")
     async def home_page():
-        return RedirectResponse("/schedule")
+        return RedirectResponse("/new")
 
     @app.get("/schedule/{schedule_id}", response_class=HTMLResponse)
     def view_new_page(schedule_id: str, request: Request):

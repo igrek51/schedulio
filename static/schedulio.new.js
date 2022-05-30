@@ -1,7 +1,7 @@
 let tableData = [
-    ['Day', 'Alice', 'Bob', 'Charlie', '...'],
+    ['Day', '...'],
 ]
-  
+
 function celRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments)
     if (row == 0) {
@@ -32,6 +32,25 @@ function afterSelection(row, column, row2, column2, preventScrolling, selectionL
     lastRow = hot.countRows() - 1
     if (row == lastRow || row2 == lastRow) {
         loadMoreVotes()
+    }
+}
+
+function afterSetDataAtCell(changes) {
+    if (changes) {
+        const lastCol = hot.countCols() - 1
+        const voteChanges = []
+        changes.forEach(([row, prop, oldValue, newValue]) => {
+            if (row == 0) {
+                if (prop == lastCol && newValue != '...' && newValue != '') {
+                    addNewGuest(newValue)
+                }
+            } else {
+                voteChanges.push([row, prop, newValue])
+            }
+        })
+        if (voteChanges.length > 0) {
+            sendVotes(voteChanges)
+        }
     }
 }
 
@@ -93,8 +112,10 @@ const hot = new Handsontable(container, {
     outsideClickDeselects: false,
     selectionMode: 'multiple',
     afterSelection: afterSelection,
+    afterSetDataAtCell: afterSetDataAtCell,
     licenseKey: 'non-commercial-and-evaluation',
 })
+
 
 $("#btn-answer-ok").click(function () {
     setSelectedCells('ok')
@@ -118,15 +139,17 @@ function voteOkHours() {
 }
 
 function setSelectedCells(value) {
-    const selected = hot.getSelected() || []
     hot.suspendRender()
+    const selected = hot.getSelected() || []
+    const lastCol = hot.countCols() - 2
+    const lastRow = hot.countRows() - 2
 
     for (let index = 0; index < selected.length; index += 1) {
         const [row1, column1, row2, column2] = selected[index]
-        const startRow = Math.max(Math.min(row1, row2), 1)
-        const endRow = Math.max(row1, row2)
-        const startCol = Math.max(Math.min(column1, column2), 1)
-        const endCol = Math.max(column1, column2)
+        const startRow = Math.max(Math.min(row1, row2, lastRow), 1)
+        const endRow = Math.min(Math.max(row1, row2), lastRow)
+        const startCol = Math.max(Math.min(column1, column2, lastCol), 1)
+        const endCol = Math.min(Math.max(column1, column2), lastCol)
 
         for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
             for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
@@ -143,11 +166,18 @@ $('[data-bs-toggle="tooltip"]').each(function(i, obj) {
     new bootstrap.Tooltip(obj)
 })
 
+
 let dayVotes = []
+let guests = []
 
 $(document).ready(function() {
     ajaxRequest('get', `/api/schedule/${scheduleId}`, function(data) {
         $("#schedule-title").html(data.title)
+    })
+    
+    ajaxRequest('get', `/api/schedule/${scheduleId}/guest`, function(data) {
+        guests = data
+        refreshAllVotes()
     })
 
     ajaxRequest('get', `/api/schedule/${scheduleId}/votes`, function(data) {
@@ -159,15 +189,20 @@ $(document).ready(function() {
 function refreshAllVotes() {
     hot.suspendRender()
 
-    tableData = [
-        ['Day', 'Alice', 'Bob', 'Charlie', '...'],
-    ]
-
-    for (let i = 0; i < dayVotes.length; i += 1) {
-        const dayVote = dayVotes[i]
-        tableData.push([dayVote.day_name, '', '', '', ''])
+    let guestsNum = guests.length
+    let headerRow = ['Day']
+    for (const guest of guests) {
+        headerRow.push(guest.name)
     }
-    tableData.push(['...', '', '', '', ''])
+    headerRow.push('...')
+    let guestColumns = Array(guests.length + 1).fill('')
+
+    tableData = [headerRow]
+    for (const dayVote of dayVotes) {
+        const row = [dayVote.day_name].concat(guestColumns)
+        tableData.push(row)
+    }
+    tableData.push(['...'].concat(guestColumns))
 
     hot.updateData(tableData)
     hot.render()
@@ -189,5 +224,48 @@ function loadMoreVotes() {
 
         hot.updateData(tableData)
         hot.render()
+    })
+}
+
+function addNewGuest(name) {
+    ajaxPayloadRequest('post', `/api/schedule/${scheduleId}/guest`, {'name': name}, function(data) {
+        guests.push(data)
+        console.log('new guest created:', name)
+        refreshAllVotes()
+    })
+}
+
+function getGuestByColumn(column) {
+    return guests[column - 1]
+}
+
+function getDayTimestampByRow(row) {
+    const dayVote = dayVotes[row - 1]
+    return dayVote.day_timestamp
+}
+
+function sendVotes(voteChanges) {
+    let votes = []
+    let guestId = 0
+
+    voteChanges.forEach(([row, prop, newValue]) => {
+        const guest = getGuestByColumn(prop)
+        if (guestId == 0) {
+            guestId = guest.id
+        } else if (guestId != guest.id) {
+            throw new Error('Found votes for different guests in one batch')
+        }
+
+        let answer = newValue
+        const day = getDayTimestampByRow(row)
+
+        votes.push({
+            day: day,
+            answer: answer,
+        })
+    })
+
+    ajaxPayloadRequest('post', `/api/guest/${guestId}/votes`, votes, function(data) {
+        console.log(`${votes.length} votes sent, guest: ${guestId}`)
     })
 }

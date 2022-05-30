@@ -18,6 +18,27 @@ function ajaxRequest(type, url, onSuccess) {
     })
 }
 
+function ajaxPayloadRequest(type, url, payload, onSuccess) {
+    $.ajax({
+        url: url,
+        type: type,
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+        cache: false,
+        success: function(data) {
+            onSuccess(data)
+        },
+        error: function (xhr, status, error) {
+            if (xhr.hasOwnProperty('responseJSON') && xhr.responseJSON.hasOwnProperty('error')) { 
+                message = xhr.responseJSON.error
+            } else {
+                message = xhr.statusText
+            }
+            showAlert('Error: ' + message, 'danger')
+        }
+    })
+}
+
 function showAlert(message, type) {
     console.log('alert ' + type + ': ' + message)
     var wrapper = document.createElement('div')
