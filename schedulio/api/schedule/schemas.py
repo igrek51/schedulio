@@ -37,7 +37,7 @@ class Vote(BaseModel):
 
 
 class DayVotes(BaseModel):
-    day_index: int
+    day_timestamp: int
     day_name: str
     day_of_week: int
     guest_votes: Dict[str, str]  # guest_id -> vote answer

@@ -25,12 +25,12 @@ def now_timestamp() -> int:
 def today_timestamp() -> int:
     """Rounded timestamp of start of the today's day in seconds"""
     now_date = now()
-    today_date = datetime(now_date.year, now_date.month, now_date.day)
+    today_date = datetime(now_date.year, now_date.month, now_date.day, tzinfo=pytz.UTC)
     return datetime_to_timestamp(today_date)
 
 
 def round_timestamp_to_day(timestamp: int) -> int:
     """Rounded timestamp of start of the day in seconds"""
     date = timestamp_to_datetime(timestamp)
-    rounded_date = datetime(date.year, date.month, date.day)
+    rounded_date = datetime(date.year, date.month, date.day, tzinfo=pytz.UTC)
     return datetime_to_timestamp(rounded_date)

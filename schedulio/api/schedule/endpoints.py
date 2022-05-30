@@ -9,7 +9,10 @@ from schedulio.api.schedule.database import (
     create_new_guest, create_new_schedule, find_guest_by_id, find_schedule_by_id, 
     list_guests_by_schedule, update_guest, update_schedule,
 )
-from schedulio.api.schedule.schedule import get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, send_multiple_guest_votes
+from schedulio.api.schedule.schedule import (
+    get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, 
+    send_multiple_guest_votes
+)
 from schedulio.api.schedule.calendar import get_more_votes
 
 

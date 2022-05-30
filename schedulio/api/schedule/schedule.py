@@ -1,21 +1,22 @@
 from datetime import timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from collections import defaultdict
+
+from nuclear.sublog import log
 
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.calendar import days_range, days_of_week_names
 from schedulio.djangoapp import models
 from schedulio.api.schedule.converters import (
-    guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, 
-    vote_model_to_schema, votes_model_to_schema,
+    schedule_model_to_schema, vote_model_to_schema, votes_model_to_schema,
 )
 from schedulio.api.schedule.database import (
-    create_new_guest, create_new_schedule, create_or_update_vote, find_guest_by_id, 
-    find_schedule_by_id, list_guests_by_schedule, list_votes_by_guest, 
-    list_votes_by_schedule, trim_old_votes, update_guest, 
-    update_guest_last_update, update_schedule,
+    create_or_update_vote, find_guest_by_id, 
+    find_schedule_by_id, list_votes_by_guest, 
+    list_votes_by_schedule, trim_old_votes, 
+    update_guest_last_update,
 )
-from schedulio.api.schedule.time import datetime_to_timestamp, round_timestamp_to_day, timestamp_to_datetime, today_timestamp
+from schedulio.api.schedule.time import round_timestamp_to_day, timestamp_to_datetime, today_timestamp
 
 spare_schedule_days_num = 14
 
@@ -54,16 +55,17 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
     max_date = timestamp_to_datetime(max_day) + timedelta(days=spare_schedule_days_num)
     
     day_votes: List[schemas.DayVotes] = []
-    for day_index, day_date in days_range(min_timestamp=today, max_date=max_date):
+    log.debug('today', today=today)
+    for day_timestamp, day_date in days_range(min_timestamp=today, max_date=max_date):
         guest_votes: Dict[str, str] = {}
-        for guest_id, vote_answer in day_to_guest_to_vote[day_index].items():
+        for guest_id, vote_answer in day_to_guest_to_vote[day_timestamp].items():
             guest_votes[guest_id] = vote_answer
 
         day_of_week = (day_date.weekday() + 1) % 7
         day_name = days_of_week_names[day_of_week] + day_date.strftime(' %Y-%m-%d')
 
         day_votes.append(schemas.DayVotes(
-            day_index=day_index,
+            day_timestamp=day_timestamp,
             day_name=day_name,
             day_of_week=day_of_week,
             guest_votes=guest_votes,
@@ -74,15 +76,15 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
 
 def send_guest_vote(guest_id: str, vote: schemas.Vote) -> schemas.Vote:
     guest_model = find_guest_by_id(guest_id)
-    day_index = round_timestamp_to_day(vote.day)
-    vote_model = create_or_update_vote(guest_model, day_index, vote.answer)
+    day_timestamp = round_timestamp_to_day(vote.day)
+    vote_model = create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)
     return vote_model_to_schema(vote_model)
 
 
 def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
     guest_model = find_guest_by_id(guest_id)
-    day_index = round_timestamp_to_day(vote.day)
+    day_timestamp = round_timestamp_to_day(vote.day)
     for vote in votes:
-        create_or_update_vote(guest_model, day_index, vote.answer)
+        create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)

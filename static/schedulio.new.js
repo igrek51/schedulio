@@ -1,10 +1,5 @@
-const data = [
-    ['Day', 'Alice', 'Bob', 'Charlie', 'David'],
-    ['Mon 2022-05-23', 'ok', '21-24', 'no', ''],
-    ['Tue 2022-05-24', 'ok', '21-24', 'no', ''],
-    ['Wed 2022-05-25', 'ok', '21-24', 'no', ''],
-    ['Thu 2022-05-26', '', '', '', ''],
-    ['Fri 2022-05-27', '', '', '', ''],
+let tableData = [
+    ['Day', 'Alice', 'Bob', 'Charlie', '...'],
 ]
   
 function celRenderer(instance, td, row, col, prop, value, cellProperties) {
@@ -42,15 +37,15 @@ function afterSelection(row, column, row2, column2, preventScrolling, selectionL
 
 function loadMoreData(n) {
     for (let i = 0; i < n; i += 1) {
-        data.push(['Sat 2022-05-27', '', '', '', ''])
+        tableData.push(['Sat 2022-05-27', '', '', '', ''])
     }
-    hot.updateData(data)
+    hot.updateData(tableData)
     hot.render()
 }
 
 const container = document.getElementById('scheduleTable')
 const hot = new Handsontable(container, {
-    data: data,
+    data: tableData,
     rowHeaders: false,
     colHeaders: false,
     width: 'auto',
@@ -156,8 +151,33 @@ $('[data-bs-toggle="tooltip"]').each(function(i, obj) {
     new bootstrap.Tooltip(obj)
 })
 
+let dayVotes = []
+
 $(document).ready(function() {
+    ajaxRequest('get', `/api/schedule/${scheduleId}`, function(data) {
+        $("#schedule-title").html(data.title)
+    })
+
     ajaxRequest('get', `/api/schedule/${scheduleId}/votes`, function(data) {
-        console.log(data)
+        dayVotes = data
+        refreshVotes()
     })
 })
+
+function refreshVotes() {
+    hot.suspendRender()
+
+    tableData = [
+        ['Day', 'Alice', 'Bob', 'Charlie', '...'],
+    ]
+
+    for (let i = 0; i < dayVotes.day_votes.length; i += 1) {
+        const dayVote = dayVotes.day_votes[i]
+        tableData.push([dayVote.day_name, '', '', '', ''])
+    }
+    tableData.push(['...', '', '', '', ''])
+
+    hot.updateData(tableData)
+    hot.render()
+    hot.resumeRender()
+}

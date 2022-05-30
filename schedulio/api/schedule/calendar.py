@@ -19,13 +19,13 @@ def get_more_votes(after_day: int) -> schemas.DayVotesBatch:
     min_date = timestamp_to_datetime(after_day) + timedelta(days=1)
     max_date = min_date + timedelta(days=6)
     day_votes: List[schemas.DayVotes] = []
-    for day_index, day_date in days_range(min_date=min_date, max_date=max_date):
+    for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
 
         day_of_week = (day_date.weekday() + 1) % 7
         day_name = days_of_week_names[day_of_week] + day_date.strftime(' %Y-%m-%d')
 
         day_votes.append(schemas.DayVotes(
-            day_index=day_index,
+            day_timestamp=day_timestamp,
             day_name=day_name,
             day_of_week=day_of_week,
             guest_votes={},
