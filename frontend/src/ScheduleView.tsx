@@ -75,6 +75,10 @@ function ScheduleView() {
                     <HoursField ref={hoursFieldRef}/>
                 </div>
 
+                <div className="grid-container">
+                    <ScheduleGrid ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
+                </div>
+
             </Container>
         </div>
     );
