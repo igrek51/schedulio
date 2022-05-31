@@ -6,10 +6,11 @@ import Container from '@mui/material/Container';
 import ScheduleGrid from './ScheduleGrid';
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import GridService from './GridService';
+import { BestMatch, GridService } from './GridService';
 import {ScheduleTitleView} from './ScheduleTitleView';
 import { HoursField } from './HoursField';
 import './grid.css';
+import BestMatchView from './BestMatchView';
 
 
 function ScheduleView() {
@@ -26,6 +27,7 @@ function ScheduleView() {
     const titleRef = React.createRef<ScheduleTitleView>();
     const scheduleGridRef = React.createRef<ScheduleGrid>();
     const hoursFieldRef = React.createRef<HoursField>();
+    const bestMatchRef = React.createRef<BestMatchView>();
     
     const { scheduleId } = useParams();
     GridService.scheduleId = scheduleId!;
@@ -36,11 +38,15 @@ function ScheduleView() {
         titleRef.current!.setState({title: title});
     };
 
+    const onBestMatchLoad = (bestMatch: BestMatch) => {
+        bestMatchRef.current!.setBestMatch(bestMatch);
+    }
+
     useEffect(() => {
         GridService.scheduleGridRef = scheduleGridRef;
         GridService.hotRef = scheduleGridRef.current!.hotTableRef;
 
-        GridService.fetchData(onTitleLoad);
+        GridService.fetchData(onTitleLoad, onBestMatchLoad);
     }, []);
 
     return (
@@ -50,9 +56,11 @@ function ScheduleView() {
 
                 <ScheduleTitleView ref={titleRef}/>
 
-                Mark your availability for the upcoming days.
+                <Tooltip title="Mark your availability for the upcoming days." arrow>
+                    <h4>Availability</h4>
+                </Tooltip>
 
-                <div className="mt-3 mb-3">
+                <div className="mt-2 mb-3">
                     <ButtonGroup>
                         <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
                             <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
@@ -77,6 +85,11 @@ function ScheduleView() {
 
                 <div className="grid-container">
                     <ScheduleGrid ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
+                </div>
+
+                <div className="mt-4 mb-5">
+                    <h4>Best match</h4>
+                    <BestMatchView ref={bestMatchRef}/>
                 </div>
 
             </Container>

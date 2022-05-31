@@ -25,7 +25,21 @@ interface Vote {
     answer: string;
 }
 
-class GridService {
+export interface BestMatch {
+    day_timestamp: number;
+    day_name: string;
+    start_time: string | null;
+    end_time: string | null;
+    min_guests: number;
+    max_guests: number;
+    total_guests: number;
+    guest_votes: string[];
+    guest_names: string[];
+    algorithm: string;
+    place: number | null;
+}
+
+export class GridService {
     static title: string = '...';
     static guests: Array<Guest> = [];
     static dayVotes: Array<DayVotes> = [];
@@ -35,7 +49,10 @@ class GridService {
     static hotRef: React.RefObject<HotTable>;
     static scheduleGridRef: React.RefObject<ScheduleGrid>;
 
-    static fetchData(onTitleLoad: (title: string) => void) {
+    static fetchData(
+        onTitleLoad: (title: string) => void,
+        onBestMatchLoad: (bestMatch: BestMatch) => void,
+        ) {
         console.log('loading data');
 
         axios.get(`/api/schedule/${this.scheduleId}`)
@@ -65,6 +82,14 @@ class GridService {
                 let dayVotes = response.data.day_votes
                 this.dayVotes = dayVotes
                 this.refreshAllVotes()
+            }).catch(response => {
+                toast(`${response}`, { type: "error" });
+            });
+
+        axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
+            .then(response => {
+                let bestMatch = response.data
+                onBestMatchLoad(bestMatch)
             }).catch(response => {
                 toast(`${response}`, { type: "error" });
             });
@@ -235,5 +260,3 @@ class GridService {
     }
 
 };
-
-export default GridService;

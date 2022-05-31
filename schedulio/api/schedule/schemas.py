@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 from pydantic import BaseModel
 
 
@@ -45,3 +45,17 @@ class DayVotes(BaseModel):
 
 class DayVotesBatch(BaseModel):
     day_votes: List[DayVotes]
+
+
+class BestMatch(BaseModel):
+    day_timestamp: int
+    day_name: str
+    start_time: Optional[str]
+    end_time: Optional[str]
+    min_guests: int
+    max_guests: int
+    total_guests: int
+    guest_votes: List[str]
+    guest_names: List[str]
+    algorithm: str
+    place: Optional[int]

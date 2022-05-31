@@ -37,7 +37,7 @@ def update_schedule(
 
 
 def list_guests_by_schedule(schedule: models.Schedule) -> List[models.Guest]:
-    return list(models.Guest.objects.filter(schedule=schedule))
+    return list(models.Guest.objects.filter(schedule=schedule).order_by('create_time'))
 
 
 def find_guest_by_id(id: str) -> models.Guest:

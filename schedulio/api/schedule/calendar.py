@@ -22,7 +22,7 @@ def get_more_votes(after_day: int) -> schemas.DayVotesBatch:
     for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
 
         day_of_week = (day_date.weekday() + 1) % 7
-        day_name = days_of_week_names[day_of_week] + day_date.strftime(' %Y-%m-%d')
+        day_name = get_day_name(day_date)
 
         day_votes.append(schemas.DayVotes(
             day_timestamp=day_timestamp,
@@ -49,3 +49,8 @@ def days_range(
     while current_date <= max_date:
         yield datetime_to_timestamp(current_date), current_date
         current_date += timedelta(days=1)
+
+
+def get_day_name(day_date: datetime) -> str:
+    day_of_week = (day_date.weekday() + 1) % 7
+    return days_of_week_names[day_of_week] + day_date.strftime(' %Y-%m-%d')

@@ -3,7 +3,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import React from "react";
-import GridService from './GridService';
+import {GridService} from './GridService';
 
 export class HoursField extends React.Component<any, any> {
     state = {hoursValue: '18-24'};

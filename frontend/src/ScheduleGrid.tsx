@@ -3,7 +3,7 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { cellRenderer } from './grid.js';
-import GridService from './GridService';
+import { GridService, BestMatch } from './GridService';
 import { HoursField } from "./HoursField.js";
 
 registerAllModules();
