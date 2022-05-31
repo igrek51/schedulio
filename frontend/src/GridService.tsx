@@ -1,5 +1,8 @@
+import React from "react";
 import { toast } from 'react-toastify';
 import axios from "axios";
+import { HotTable } from '@handsontable/react';
+import ScheduleGrid from "./ScheduleGrid";
 
 
 interface Guest {
@@ -10,16 +13,29 @@ interface Guest {
     last_update: number;
 }
 
+interface DayVotes {
+    day_timestamp: number;
+    day_name: string;
+    day_of_week: number;
+    guest_votes: Record<string, string>;
+}
 
-const GridService = {
-    title: '...',
-    guests: [],
-    dayVotes: [],
-    scheduleId: '',
-    guestsById: {},
-    guestIdToIndex: {},
+interface Vote {
+    day: number;
+    answer: string;
+}
 
-    fetchData(onTitleLoad: (title: string) => void) {
+class GridService {
+    static title: string = '...';
+    static guests: Array<Guest> = [];
+    static dayVotes: Array<DayVotes> = [];
+    static scheduleId: string = '';
+    static guestsById: Record<string, Guest> = {};
+    static guestIdToIndex: Record<string, number> = {};
+    static hotRef: React.RefObject<HotTable>;
+    static scheduleGridRef: React.RefObject<ScheduleGrid>;
+
+    static fetchData(onTitleLoad: (title: string) => void) {
         console.log('loading data');
 
         axios.get(`/api/schedule/${this.scheduleId}`)
@@ -52,11 +68,172 @@ const GridService = {
             }).catch(response => {
                 toast(`${response}`, { type: "error" });
             });
-    },
+    }
 
-    refreshAllVotes() {
+    static refreshAllVotes() {
+        let hot = this.hotRef.current!.hotInstance!;
+        hot.suspendRender()
 
-    },
+        const guestsNum = this.guests.length
+        let headerRow = ['Day']
+        for (const guest of this.guests) {
+            headerRow.push(guest.name)
+        }
+        headerRow.push('<u>Add</u>')
+        let guestEmptyColumns = Array(guestsNum + 1).fill('')
+    
+        let tableData = [headerRow]
+        for (const dayVote of this.dayVotes) {
+    
+            let guestCells = Array(guestsNum + 1).fill('')
+            for (const [guestId, answer] of Object.entries(dayVote.guest_votes)) {
+                const guestIndex = this.guestIdToIndex[guestId]
+                guestCells[guestIndex] = answer
+            }
+    
+            const row = [dayVote.day_name].concat(guestCells)
+            tableData.push(row)
+        }
+        tableData.push(['...'].concat(guestEmptyColumns))
+
+        this.scheduleGridRef.current!.setTableData(tableData)
+
+        hot.render()
+        hot.resumeRender()
+    }
+
+    static loadMoreVotes() {
+        const lastDay = this.dayVotes[this.dayVotes.length - 1].day_timestamp
+        
+        axios.get(`/api/schedule/${this.scheduleId}/votes/more/${lastDay}`)
+            .then(response => {
+
+                let guestsNum = this.guests.length
+                let guestEmptyColumns = Array(guestsNum + 1).fill('')
+        
+                const batchVotes = response.data.day_votes
+
+                const scheduleGrid = this.scheduleGridRef.current!
+                const tableData = scheduleGrid.tableData
+
+                tableData.pop()
+                for (let i = 0; i < batchVotes.length; i += 1) {
+                    const dayVote = batchVotes[i]
+                    this.dayVotes.push(dayVote)
+                    tableData.push([dayVote.day_name].concat(guestEmptyColumns))
+                }
+                tableData.push(['...'].concat(guestEmptyColumns))
+        
+                let hot = this.hotRef.current!.hotInstance!;
+                hot.updateData(tableData)
+                hot.render()
+                
+            }).catch(response => {
+                toast(`${response}`, { type: "error" });
+            });
+    }
+
+    static addNewGuest(name: string) {
+        axios.post(`/api/schedule/${this.scheduleId}/guest`, {name: name})
+            .then(response => {
+
+                this.guests.push(response.data)
+                const self: any = this;
+                this.guests.forEach(function (guest, i) {
+                    self.guestsById[guest.id] = guest
+                    self.guestIdToIndex[guest.id] = i
+                })
+                console.log('new guest created:', name)
+                this.refreshAllVotes()
+
+            }).catch(response => {
+                toast(`${response}`, { type: "error" });
+            });
+    }
+
+    static getGuestByColumn(column: number): Guest {
+        return this.guests[column - 1]
+    }
+    
+    static getDayTimestampByRow(row: number): number {
+        const dayVote = this.dayVotes[row - 1]
+        return dayVote.day_timestamp
+    }
+
+    static sendVotes(voteChanges: Array<any>) {
+        const votes: Vote[] = []
+        let guestId: string = ''
+    
+        voteChanges.forEach(([row, col, newValue]) => {
+            const guest = this.getGuestByColumn(col)
+            if (guestId == '') {
+                guestId = guest.id
+            } else if (guestId != guest.id) {
+                throw new Error('Found votes for different guests in one batch')
+            }
+    
+            let answer = newValue
+            if (!answer) {
+                answer = ''
+            }
+            const day = this.getDayTimestampByRow(row)
+    
+            votes.push({
+                day: day,
+                answer: answer,
+            })
+        })
+    
+        axios.post(`/api/guest/${guestId}/votes`, votes)
+            .then(response => {
+                console.log(`sent ${votes.length} votes of guest: ${guestId}`)
+                
+            }).catch(response => {
+                toast(`${response}`, { type: "error" });
+            });
+    }
+
+    static renameGuest(guestIndex: any, newName: string) {
+        const guest = this.guests[guestIndex]
+        axios.put(`/api/guest/${guest.id}`, {name: newName})
+            .then(response => {
+                guest.name = newName
+                console.log(`Guest renamed to ${newName}`)
+
+            }).catch(response => {
+                toast(`${response}`, { type: "error" });
+            });
+    }
+
+    static voteOkHours(value: string) {
+        this.setSelectedCells(value)
+    }
+
+    static setSelectedCells(value: string) {
+        let hot = this.hotRef.current!.hotInstance!;
+        hot.suspendRender()
+        const selected = hot.getSelected() || []
+        const lastCol = hot.countCols() - 2
+        const lastRow = hot.countRows() - 2
+    
+        for (let index = 0; index < selected.length; index += 1) {
+            const [row1, column1, row2, column2] = selected[index]
+            const startRow = Math.max(Math.min(row1, row2), 1)
+            const endRow = Math.min(Math.max(row1, row2), lastRow)
+            const startCol = Math.max(Math.min(column1, column2), 1)
+            const endCol = Math.min(Math.max(column1, column2), lastCol)
+    
+            for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
+                for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
+                    hot.setDataAtCell(rowIndex, columnIndex, value)
+                }
+            }
+        }
+      
+        hot.render()
+        hot.resumeRender()
+    }
+
 };
 
 export default GridService;
