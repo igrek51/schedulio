@@ -6,8 +6,8 @@ function App() {
   return (
     <BrowserRouter basename="/">
       <Routes>
-          <Route path="/" element={<ScheduleView/>}/>
-          <Route path="/schedule/:id" element={<ScheduleView/>}/>
+          {/* <Route path="/" element={<ScheduleView/>}/> */}
+          <Route path="/schedule/:scheduleId" element={<ScheduleView/>}/>
       </Routes>
     </BrowserRouter>
   );

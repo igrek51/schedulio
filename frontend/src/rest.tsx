@@ -1,12 +1,8 @@
-export {loadMoreVotes, addNewGuest, sendVotes, renameGuest, voteOkHours, setSelectedCells};
+export { loadMoreVotes, addNewGuest, sendVotes, renameGuest, voteOkHours, setSelectedCells };
 
-let dayVotes: Array<any> = []
-let guests: Array<any> = []
-let guestsById: any = {}
-let guestIdToIndex: any = {}
-
-let scheduleId: string = '';
-
+export function refreshAllVotes() {
+    
+}
 
 function loadMoreVotes() {
     // const lastDay = dayVotes[dayVotes.length - 1].day_timestamp

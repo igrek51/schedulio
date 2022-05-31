@@ -1,4 +1,3 @@
-import 'react-toastify/dist/ReactToastify.css';
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
