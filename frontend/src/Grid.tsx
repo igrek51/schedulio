@@ -15,24 +15,24 @@ function ScheduleGrid() {
   
   function cellRenderer(instance: any, td: any, row: number, col: number, prop: number, value: string, cellProperties: any) {
     // Handsontable.renderers.TextRenderer(instance, td, row, col, prop, value, cellProperties);
-    if (row == 0) {
+    if (row === 0) {
         td.style.color = '#000000'
         td.style.background = '#F8F9FA'
         td.style.fontWeight = 'bold'
-        if (col == instance.countCols() - 1) {
+        if (col === instance.countCols() - 1) {
             td.innerHTML = '<u>Name</u>'
         }
-    } else if (col == 0) {
+    } else if (col === 0) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'
-    } else if (value == 'ok') {
+    } else if (value === 'ok') {
         td.style.color = '#38782E'
         td.style.background = '#D9EAD3'
         td.style.fontWeight = 'bold'
-    } else if (value == 'no') {
+    } else if (value === 'no') {
         td.style.color = '#AC322C'
         td.style.background = '#EA9999'
-    } else if (value == '' || value == null || value == undefined) {
+    } else if (value === '' || !value) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'
     } else {
@@ -44,7 +44,7 @@ function ScheduleGrid() {
 
   function cells(row: number, col: number, prop: string | number): any {
       const cellProperties = {readOnly: false, renderer: cellRenderer};
-      if (col == 0) {
+      if (col === 0) {
           cellProperties.readOnly = true
       } else {
           cellProperties.readOnly = false
@@ -54,7 +54,7 @@ function ScheduleGrid() {
 
   function afterSelection(hot: any, row: number, column: number, row2: number, column2: number, preventScrolling: any, selectionLayerLevel: any) {
     const lastRow = hot.countRows() - 1
-    if (row == lastRow || row2 == lastRow) {
+    if (row === lastRow || row2 === lastRow) {
         loadMoreVotes()
     }
   }
@@ -65,11 +65,11 @@ function ScheduleGrid() {
         const lastRow = hot.countRows() - 1
         const voteChanges: Array<any> = []
         changes.forEach(([row, col, oldValue, newValue]) => {
-            if (row == 0 && col == lastCol && newValue) {
+            if (row === 0 && col === lastCol && newValue) {
                 addNewGuest(newValue)
             } else if (row > 0 && row < lastRow && col > 0 && col < lastCol) {
                 voteChanges.push([row, col, newValue])
-            } else if (row == 0 && col > 0 && col < lastCol) {
+            } else if (row === 0 && col > 0 && col < lastCol) {
                 renameGuest(col - 1, newValue)
             }
         })
@@ -86,7 +86,7 @@ function ScheduleGrid() {
     width: 'auto',
     height: 'auto',
     colWidths(index: number) {
-        if (index == 0) {
+        if (index === 0) {
             return 150
         }
         return 100
