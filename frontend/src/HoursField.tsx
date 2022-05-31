@@ -26,18 +26,20 @@ export class HoursField extends React.Component<any, any> {
 
     render() {
         return (
-            <ButtonGroup>
-                <Tooltip title="Specify availability hours in selected days" arrow>
-                    <Button variant="contained" onClick={this.setAvailabilityHours}>
-                        Set hours:
-                    </Button>
-                </Tooltip>
+            <span>
+                <ButtonGroup>
+                    <Tooltip title="Specify availability hours in selected days" arrow>
+                        <Button variant="contained" onClick={this.setAvailabilityHours}>
+                            Set hours:
+                        </Button>
+                    </Tooltip>
+                </ButtonGroup>
                 <Tooltip title="Type hours in 'HH-HH' format or 'HH:MM - HH:MM'" arrow>
                     <TextField label="Availability Hours" variant="outlined" size="small" 
                         value={this.state.hoursValue}
                         onChange={this._handleTextFieldChange.bind(this)}/>
                 </Tooltip>
-            </ButtonGroup>
+            </span>
         )
     }
 }

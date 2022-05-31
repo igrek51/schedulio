@@ -1,14 +1,15 @@
 import { ToastContainer, toast } from 'react-toastify';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
+import Container from '@mui/material/Container';
 import ScheduleGrid from './ScheduleGrid';
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import GridService from './GridService';
 import {ScheduleTitleView} from './ScheduleTitleView';
 import { HoursField } from './HoursField';
+import './grid.css';
 
 
 function ScheduleView() {
@@ -43,35 +44,38 @@ function ScheduleView() {
     }, []);
 
     return (
-        <div className="App">
+        <div className="App mt-3">
             <ToastContainer />
-            <div className="container mt-3">
+            <Container maxWidth="lg">
 
                 <ScheduleTitleView ref={titleRef}/>
 
-                <ButtonGroup>
-                    <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
-                        <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
-                            OK
-                        </Button>
-                    </Tooltip>
-                    <Tooltip title="Vote for &quot;Maybe&quot; (empty cell) in selected days" arrow>
-                        <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
-                            Maybe
-                        </Button>
-                    </Tooltip>
-                    <Tooltip title="Vote for &quot;I can't&quot; in selected days" arrow>
-                        <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
-                            No
-                        </Button>
-                    </Tooltip>
-                </ButtonGroup>
+                Mark your availability for the upcoming days.
 
-                <HoursField ref={hoursFieldRef}/>
+                <div className="mt-3 mb-3">
+                    <ButtonGroup>
+                        <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
+                            <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
+                                OK
+                            </Button>
+                        </Tooltip>
+                        <Tooltip title="Vote for &quot;Maybe&quot; (empty cell) in selected days" arrow>
+                            <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
+                                Maybe
+                            </Button>
+                        </Tooltip>
+                        <Tooltip title="Vote for &quot;I can't&quot; in selected days" arrow>
+                            <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
+                                No
+                            </Button>
+                        </Tooltip>
+                    </ButtonGroup>
 
-                <ScheduleGrid ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
+                    <span className="ms-2"></span>
+                    <HoursField ref={hoursFieldRef}/>
+                </div>
 
-            </div>
+            </Container>
         </div>
     );
 }

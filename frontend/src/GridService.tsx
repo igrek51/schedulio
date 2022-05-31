@@ -79,7 +79,7 @@ class GridService {
         for (const guest of this.guests) {
             headerRow.push(guest.name)
         }
-        headerRow.push('<u>Add</u>')
+        headerRow.push('')
         let guestEmptyColumns = Array(guestsNum + 1).fill('')
     
         let tableData = [headerRow]
