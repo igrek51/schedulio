@@ -1,0 +1,20 @@
+all:
+  hosts:
+    igrek.dev:
+  vars:
+    ansible_connection: ssh
+    ansible_port: 2222
+    ansible_user: root
+    ask_pass: false
+    ssh_args: "-o PubkeyAuthentication=yes -o PasswordAuthentication=yes -o ControlMaster=auto -o ControlPersist=60s"
+    component_name: schedulio
+    component_dir: "/opt/schedulio"
+    component_dirs:
+      - "{{ component_dir }}"
+      - "{{ component_dir }}/volumes"
+      - "{{ component_dir }}/volumes/db"
+    build_image: false
+    copy_volumes: false
+    copy_volumes_data:
+      - src: "../db/schedulio.sqlite"
+        dst: "{{ component_dir }}/volumes/db/schedulio.sqlite"

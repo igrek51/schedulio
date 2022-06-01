@@ -31,6 +31,7 @@ test:
 	cd tests &&\
 	python -m pytest -vv --tb=short -ra $(test)
 
+
 recreate-db:
 	rm -f db/schedulio.sqlite
 	python schedulio/djangoapp/manage.py makemigrations djangoapp
@@ -40,3 +41,22 @@ recreate-db:
 add-migration:
 	python schedulio/djangoapp/manage.py makemigrations djangoapp
 	python schedulio/djangoapp/manage.py migrate
+
+
+frontend-setup:
+	cr frontend && make setup
+
+frontend-run:
+	cd frontend && make run
+
+frontend-build:
+	cd frontend && make build
+
+
+deploy: build
+	cd deploy && \
+	ansible-playbook -i inventory.yaml deploy-playbook.yaml
+
+deploy-with-volumes: build
+	cd deploy && \
+	ansible-playbook -i inventory.yaml deploy-playbook.yaml --extra-vars "copy_volumes=true"

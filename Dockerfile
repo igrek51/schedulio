@@ -12,7 +12,7 @@ RUN cd /src/schedulio && python setup.py develop
 
 ENV DEBUG false
 ENV DJANGO_SETTINGS_MODULE "schedulio.djangoapp.settings"
-CMD python -u schedulio/main.py
+CMD python -u -m schedulio run
 
 EXPOSE 8000
 STOPSIGNAL SIGTERM
