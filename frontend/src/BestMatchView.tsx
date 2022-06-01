@@ -16,13 +16,13 @@ export class BestMatchView extends React.Component<any, any> {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
         this.tableData = [
-            ['Day', 'Guests', ''],
+            ['Day', 'Participants', ''],
         ]
     }
 
     setBestMatch(bestMatch: BestMatch) {
 
-        let headerRow = ['Day', 'Guests']
+        let headerRow = ['Day', 'Participants']
         for (const name of bestMatch.guest_names) {
             headerRow.push(name)
         }

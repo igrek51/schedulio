@@ -56,9 +56,9 @@ function ScheduleView() {
 
                 <ScheduleTitleView ref={titleRef}/>
 
-                <Tooltip title="Mark your availability for the upcoming days." arrow>
-                    <h4>Availability</h4>
-                </Tooltip>
+                <div>
+                    Mark your availability.
+                </div>
 
                 <div className="mt-2 mb-3">
                     <ButtonGroup>
