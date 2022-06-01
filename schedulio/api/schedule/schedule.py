@@ -55,7 +55,6 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
     max_date = timestamp_to_datetime(max_day) + timedelta(days=spare_schedule_days_num)
     
     day_votes: List[schemas.DayVotes] = []
-    log.debug('today', today=today)
     for day_timestamp, day_date in days_range(min_timestamp=today, max_date=max_date):
         guest_votes: Dict[str, str] = {}
         for guest_id, vote_answer in day_to_guest_to_vote[day_timestamp].items():

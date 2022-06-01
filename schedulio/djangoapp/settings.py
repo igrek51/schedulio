@@ -67,3 +67,8 @@ USE_L10N = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/admin/login/'
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://schedulio.igrek.dev", 
+    "http://schedulio.igrek.dev",
+]

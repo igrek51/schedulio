@@ -8,6 +8,7 @@ function App() {
       <Routes>
           {/* <Route path="/" element={<ScheduleView/>}/> */}
           <Route path="/schedule/:scheduleId" element={<ScheduleView/>}/>
+          <Route path="/s/:scheduleId" element={<ScheduleView/>}/>
       </Routes>
     </BrowserRouter>
   );

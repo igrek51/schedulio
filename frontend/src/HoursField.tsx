@@ -30,7 +30,7 @@ export class HoursField extends React.Component<any, any> {
                 <ButtonGroup>
                     <Tooltip title="Specify availability hours in selected days" arrow>
                         <Button variant="contained" onClick={this.setAvailabilityHours}>
-                            Set hours:
+                            Time range:
                         </Button>
                     </Tooltip>
                 </ButtonGroup>
