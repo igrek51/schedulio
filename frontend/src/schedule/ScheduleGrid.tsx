@@ -4,7 +4,7 @@ import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { cellRenderer } from './grid.js';
 import { GridService, BestMatch } from './GridService';
-import { HoursField } from "./HoursField.js";
+import { TimeRangeField } from "./TimeRangeField.js";
 
 registerAllModules();
 
@@ -12,7 +12,7 @@ registerAllModules();
 export class ScheduleGrid extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
-    hoursFieldRef: React.RefObject<HoursField>;
+    hoursFieldRef: React.RefObject<TimeRangeField>;
     tableData: Array<Array<string>>;
 
     constructor(props: any) {

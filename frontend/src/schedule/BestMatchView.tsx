@@ -2,7 +2,7 @@ import React from "react";
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
-import { GridService, BestMatch } from './GridService';
+import { BestMatch } from './GridService';
 
 registerAllModules();
 
@@ -16,18 +16,22 @@ export class BestMatchView extends React.Component<any, any> {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
         this.tableData = [
-            ['Day', 'Participants', ''],
+            ['Day', 'Time', 'Participants', ''],
         ]
     }
 
     setBestMatch(bestMatch: BestMatch) {
-
-        let headerRow = ['Day', 'Participants']
+        let headerRow = ['Day', 'Time', 'Participants']
         for (const name of bestMatch.guest_names) {
             headerRow.push(name)
         }
 
-        let resultRow = [bestMatch.day_name, `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`]
+        let timerange = ''
+        let resultRow = [
+            bestMatch.day_name,
+            timerange,
+            `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`,
+        ]
         for (const vote of bestMatch.guest_votes) {
             resultRow.push(vote)
         }

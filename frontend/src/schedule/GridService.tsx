@@ -49,18 +49,54 @@ export class GridService {
     static hotRef: React.RefObject<HotTable>;
     static scheduleGridRef: React.RefObject<ScheduleGrid>;
 
+    static toastInfo(msg: string) {
+        toast.info(msg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }
+
+    static toastError(msg: string) {
+        toast.error(msg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }
+
+    static toastSuccess(msg: string) {
+        toast.success(msg, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }
+
     static fetchData(
         onTitleLoad: (title: string) => void,
         onBestMatchLoad: (bestMatch: BestMatch) => void,
         ) {
-        console.log('loading data');
+        console.log('loading data...');
 
         axios.get(`/api/schedule/${this.scheduleId}`)
             .then(response => {
                 this.title = response.data.title;
                 onTitleLoad(this.title);
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Fetching schedule: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/guest`)
@@ -74,7 +110,7 @@ export class GridService {
                 this.guests = guests
                 this.refreshAllVotes()
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Fetching guests: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/votes`)
@@ -83,7 +119,7 @@ export class GridService {
                 this.dayVotes = dayVotes
                 this.refreshAllVotes()
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Fetching votes: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
@@ -91,7 +127,7 @@ export class GridService {
                 let bestMatch = response.data
                 onBestMatchLoad(bestMatch)
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Fetching matches: ${response}`);
             });
     }
 
@@ -128,7 +164,10 @@ export class GridService {
     }
 
     static loadMoreVotes() {
-        const lastDay = this.dayVotes[this.dayVotes.length - 1].day_timestamp
+        let lastDay = 0
+        if (this.dayVotes.length > 0) {
+            lastDay = this.dayVotes[this.dayVotes.length - 1].day_timestamp
+        }
         
         axios.get(`/api/schedule/${this.scheduleId}/votes/more/${lastDay}`)
             .then(response => {
@@ -154,7 +193,7 @@ export class GridService {
                 hot.render()
                 
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Loading more days: ${response}`);
             });
     }
 
@@ -172,7 +211,7 @@ export class GridService {
                 this.refreshAllVotes()
 
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Creating guest: ${response}`);
             });
     }
 
@@ -214,7 +253,7 @@ export class GridService {
                 console.log(`sent ${votes.length} votes of guest: ${guestId}`)
                 
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Sending votes: ${response}`);
             });
     }
 
@@ -226,7 +265,7 @@ export class GridService {
                 console.log(`Guest renamed to ${newName}`)
 
             }).catch(response => {
-                toast(`${response}`, { type: "error" });
+                this.toastError(`Renaming guest: ${response}`);
             });
     }
 
