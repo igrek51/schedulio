@@ -93,7 +93,7 @@ function ScheduleView() {
 
                 <ScheduleTitleView ref={titleRef}/>
 
-                <div className="d-inline-block ms-2 mt-2">
+                <div className="d-inline-block ml-2 mt-2">
                     <IconButton
                         aria-label="more"
                         id="basic-menu-button"
@@ -121,7 +121,7 @@ function ScheduleView() {
 
                 </Grid>
 
-                <div className="ms-1">
+                <div className="ml-1">
                     Select cells and mark your availability.
                 </div>
 
@@ -150,7 +150,7 @@ function ScheduleView() {
                         <TimeRangeField ref={hoursFieldRef}/>
                     </div>
 
-                    <div className="d-inline-block ms-2 mt-2">
+                    <div className="d-inline-block ml-2 mt-2">
                         <NewGuestView addGuestContainer={addGuestContainer} scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>
