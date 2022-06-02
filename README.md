@@ -1,2 +1,2 @@
 # Schedulio
-Schedule events continuously
+Schedulio lets you plan your periodic events continuously

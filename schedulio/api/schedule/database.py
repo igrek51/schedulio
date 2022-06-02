@@ -5,7 +5,7 @@ from nuclear.sublog import log
 from schedulio.api.errors import EntityNotFound
 from schedulio.api.schedule import schemas
 from schedulio.djangoapp import models
-from schedulio.api.schedule.time import now_timestamp, today_timestamp
+from schedulio.api.schedule.time import local_today_timestamp, now_timestamp
 
 
 def find_schedule_by_id(id: str) -> models.Schedule:
@@ -130,5 +130,5 @@ def trim_old_votes(older_than: int):
 
 
 def trim_old_votes_today():
-    today = today_timestamp()
-    trim_old_votes(today)
+    trim_timestamp = local_today_timestamp()
+    trim_old_votes(trim_timestamp)

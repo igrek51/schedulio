@@ -60,7 +60,7 @@ def _find_best_match(
 
     for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
 
-        guest_votes: Dict[str, str] = day_guest_vote_map[day_timestamp]
+        guest_votes: Dict[str, str] = day_guest_vote_map.get(day_timestamp, {})
         time_match = _find_best_time_match(guest_votes, guest_ids)
         start_time = time_match.start_time.strftime("%H:%M")
         end_time = time_match.end_time.strftime("%H:%M")

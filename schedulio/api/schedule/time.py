@@ -22,11 +22,24 @@ def now_timestamp() -> int:
     return datetime_to_timestamp(now())
 
 
-def today_timestamp() -> int:
+def datetime_to_str(dt: datetime) -> str:
+    """Convert datetime to ISO 8601 format"""
+    return dt.strftime('%Y-%m-%dT%H:%M:%S%z')
+
+
+def utc_today_timestamp() -> int:
     """Rounded timestamp of start of the today's day in seconds"""
-    now_date = now()
-    today_date = datetime(now_date.year, now_date.month, now_date.day, tzinfo=pytz.UTC)
+    utc_now_time = now()
+    today_date = datetime(utc_now_time.year, utc_now_time.month, utc_now_time.day, tzinfo=pytz.UTC)
     return datetime_to_timestamp(today_date)
+
+
+def local_today_timestamp(now_provider = now) -> int:
+    local_tz = pytz.timezone('Europe/Warsaw')
+    now_utc = now_provider()
+    now_local = now_utc.astimezone(tz=local_tz)
+    local_today_date = datetime(now_local.year, now_local.month, now_local.day, tzinfo=pytz.UTC)
+    return datetime_to_timestamp(local_today_date)
 
 
 def round_timestamp_to_day(timestamp: int) -> int:
