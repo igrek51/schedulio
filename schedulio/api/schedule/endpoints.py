@@ -3,15 +3,28 @@ from fastapi import FastAPI
 
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.converters import (
-    guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, 
+    guest_model_to_schema, 
+    guests_model_to_schema, 
+    schedule_model_to_schema, 
 )
 from schedulio.api.schedule.database import (
-    create_new_guest, create_new_schedule, delete_guest, find_guest_by_id, find_schedule_by_path_id, 
-    list_guests_by_schedule, update_guest, update_schedule,
+    create_new_guest, 
+    create_new_schedule, 
+    delete_guest, 
+    delete_schedule, 
+    find_guest_by_id, 
+    find_schedule_by_path_id, 
+    list_guests_by_schedule, 
+    update_guest, 
+    update_schedule,
 )
 from schedulio.api.schedule.schedule import (
-    get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, 
-    send_multiple_guest_votes, find_schedule_match_most_participants
+    get_guest_votes, 
+    get_schedule_schema, 
+    get_schedule_votes, 
+    send_guest_vote, 
+    send_multiple_guest_votes, 
+    find_schedule_match_most_participants,
 )
 from schedulio.api.schedule.calendar import get_more_votes
 

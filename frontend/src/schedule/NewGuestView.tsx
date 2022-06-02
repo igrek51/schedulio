@@ -47,6 +47,8 @@ export default function NewGuestView(props: any) {
         }
     }
 
+    props.addGuestContainer.handleClickOpen = handleClickOpen
+
     return (
         <div>
             <ButtonGroup>
