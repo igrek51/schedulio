@@ -72,11 +72,13 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
     return schemas.DayVotesBatch(day_votes=day_votes)
 
 
-def send_guest_vote(guest_id: str, vote: schemas.Vote) -> schemas.Vote:
+def send_guest_vote(guest_id: str, vote: schemas.Vote) -> Optional[schemas.Vote]:
     guest_model = find_guest_by_id(guest_id)
     day_timestamp = round_timestamp_to_day(vote.day)
     vote_model = create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)
+    if vote_model is None:
+        return None
     return vote_model_to_schema(vote_model)
 
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI
 
 from schedulio.api.schedule import schemas
@@ -66,7 +66,7 @@ def setup_endpoints(app: FastAPI):
     def _get_guest_votes(guest_id: str):
         return get_guest_votes(guest_id)
 
-    @app.post("/api/guest/{guest_id}/vote", response_model=schemas.Vote)
+    @app.post("/api/guest/{guest_id}/vote", response_model=Optional[schemas.Vote])
     def _send_guest_vote(guest_id: str, vote: schemas.Vote):
         return send_guest_vote(guest_id, vote)
 

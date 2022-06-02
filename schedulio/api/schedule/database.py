@@ -88,13 +88,18 @@ def get_guest_vote_by_day(guest: models.Guest, day: int) -> models.Vote:
         raise EntityNotFound(f'Vote for guest {guest}, day {day} was not found')
 
 
-def create_or_update_vote(guest: models.Guest, day: int, answer: str) -> models.Vote:
+def create_or_update_vote(guest: models.Guest, day: int, answer: str) -> Optional[models.Vote]:
     try:
         vote = models.Vote.objects.get(guest=guest, day=day)
+        if answer == '':
+            vote.delete()
+            return None
         vote.answer = answer
         vote.save()
         return vote
     except models.Vote.DoesNotExist:
+        if answer == '':
+            return None
         new_vote = models.Vote(
             guest=guest,
             schedule=guest.schedule,
