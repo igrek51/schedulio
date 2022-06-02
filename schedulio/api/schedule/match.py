@@ -1,34 +1,11 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, time
 import re
-from typing import Callable, Dict, List, Optional, Tuple
-from collections import defaultdict
+from typing import Callable, Dict, List, Optional
 from pydantic import BaseModel
 import pytz
 
 from schedulio.api.schedule import schemas
-from schedulio.api.schedule.calendar import days_range
-from schedulio.api.schedule.converters import guests_model_to_schema
-from schedulio.djangoapp import models
-from schedulio.api.schedule.database import (
-    find_schedule_by_id, list_guests_by_schedule, 
-    list_votes_by_schedule, trim_old_votes, 
-)
-from schedulio.api.schedule.time import timestamp_to_datetime, today_timestamp
-
-
-def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.BestMatch]:
-    today = today_timestamp()
-    trim_old_votes(today)
-
-    schedule_model = find_schedule_by_id(schedule_id)
-    votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
-    guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_id))
-
-    day_guest_vote_map, max_date = _group_votes(votes, today)
-    max_date = max_date + timedelta(days=1)
-    min_date = timestamp_to_datetime(today)
-
-    return find_match_most_participants(min_date, max_date, guests, day_guest_vote_map)
+from schedulio.api.schedule.calendar import days_range, get_day_name
 
 
 def find_match_most_participants(
@@ -48,20 +25,6 @@ def find_match_most_participants(
         _match_condition, _match_score, 'most_participants',
     )
     return best_match
-
-
-def _group_votes(votes: List[models.Vote], today: int) -> Tuple[Dict[int, Dict[str, str]], datetime]:
-    day_guest_vote_map = defaultdict(dict)
-    max_timestamp: int = today
-    for vote in votes:
-        day_timestamp = vote.day
-        guest_id = vote.guest.id
-        vote_answer = vote.answer
-        if day_timestamp > max_timestamp:
-            max_timestamp = day_timestamp
-        day_guest_vote_map[day_timestamp][guest_id] = vote_answer
-    max_date = timestamp_to_datetime(max_timestamp)
-    return day_guest_vote_map, max_date
 
 
 class TimeMatch(BaseModel):
@@ -104,6 +67,7 @@ def _find_best_match(
 
         match = schemas.BestMatch(
             day_timestamp=day_timestamp,
+            day_name=get_day_name(day_date),
             day_date=day_date,
             start_time=start_time,
             end_time=end_time,
@@ -165,8 +129,8 @@ def _count_conditional_votes(
     conditional_votes: List[TimeRange],
 ) -> TimeMatch:
     guest_count = 0
-    start_time: time = datetime.time(hour=0, minute=0, tzinfo=pytz.UTC)
-    end_time: time = datetime.time(hour=23, minute=59, tzinfo=pytz.UTC)
+    start_time: time = time(hour=0, minute=0, tzinfo=pytz.UTC)
+    end_time: time = time(hour=23, minute=59, tzinfo=pytz.UTC)
 
     if not conditional_votes:
         return TimeMatch(
@@ -228,7 +192,7 @@ def _parse_time_range(string: str) -> TimeRange:
         start_time = _parse_time(start)
         return TimeRange(
             start_time=start_time,
-            end_time=datetime.time(hour=23, minute=59, tzinfo=pytz.UTC),
+            end_time=time(hour=23, minute=59, tzinfo=pytz.UTC),
         )
 
     raise ValueError(f'Invalid time range format: {string}')
@@ -245,7 +209,7 @@ def _parse_time(stime: str) -> time:
             assert minute == 0, "can't be more than 24:00"
             hour = 23
             minute = 59
-        return datetime.time(hour=hour, minute=minute, tzinfo=pytz.UTC)
+        return time(hour=hour, minute=minute, tzinfo=pytz.UTC)
 
     match = re.fullmatch(r'(\d+)', stime)
     if match:
@@ -255,6 +219,6 @@ def _parse_time(stime: str) -> time:
         if hour == 24:
             hour = 23
             minute = 59
-        return datetime.time(hour=hour, minute=minute, tzinfo=pytz.UTC)
+        return time(hour=hour, minute=minute, tzinfo=pytz.UTC)
 
     raise ValueError(f'Invalid time format: {stime}')

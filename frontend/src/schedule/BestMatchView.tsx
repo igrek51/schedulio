@@ -26,7 +26,7 @@ export class BestMatchView extends React.Component<any, any> {
             headerRow.push(name)
         }
 
-        let timerange = ''
+        let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
         let resultRow = [
             bestMatch.day_name,
             timerange,

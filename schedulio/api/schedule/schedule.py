@@ -1,16 +1,17 @@
-from datetime import timedelta
-from typing import Dict, List
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
 from collections import defaultdict
 
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.calendar import days_range, get_day_name
+from schedulio.api.schedule.match import find_match_most_participants
 from schedulio.djangoapp import models
 from schedulio.api.schedule.converters import (
-    schedule_model_to_schema, vote_model_to_schema, votes_model_to_schema,
+    guests_model_to_schema, schedule_model_to_schema, vote_model_to_schema, votes_model_to_schema,
 )
 from schedulio.api.schedule.database import (
     create_or_update_vote, find_guest_by_id, 
-    find_schedule_by_id, list_votes_by_guest, 
+    find_schedule_by_id, list_guests_by_schedule, list_votes_by_guest, 
     list_votes_by_schedule, trim_old_votes, 
     update_guest_last_update,
 )
@@ -86,3 +87,31 @@ def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
         create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)
 
+
+def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.BestMatch]:
+    today = today_timestamp()
+    trim_old_votes(today)
+
+    schedule_model = find_schedule_by_id(schedule_id)
+    votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
+    guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_id))
+
+    day_guest_vote_map, max_date = group_votes(votes, today)
+    max_date = max_date + timedelta(days=1)
+    min_date = timestamp_to_datetime(today)
+
+    return find_match_most_participants(min_date, max_date, guests, day_guest_vote_map)
+
+
+def group_votes(votes: List[models.Vote], today: int) -> Tuple[Dict[int, Dict[str, str]], datetime]:
+    day_guest_vote_map = defaultdict(dict)
+    max_timestamp: int = today
+    for vote in votes:
+        day_timestamp = vote.day
+        guest_id = vote.guest.id
+        vote_answer = vote.answer
+        if day_timestamp > max_timestamp:
+            max_timestamp = day_timestamp
+        day_guest_vote_map[day_timestamp][guest_id] = vote_answer
+    max_date = timestamp_to_datetime(max_timestamp)
+    return day_guest_vote_map, max_date

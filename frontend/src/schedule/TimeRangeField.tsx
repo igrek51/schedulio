@@ -28,7 +28,7 @@ export class TimeRangeField extends React.Component<any, any> {
     render() {
         return (
             <span>
-                <Tooltip title="Type hours in 'HH-HH' format or 'HH:MM - HH:MM'" arrow>
+                <Tooltip title="Type hours in 'HH-HH' format, 'HH:MM - HH:MM' or 'HH+'" arrow>
                     <TextField label="Availability Hours" variant="outlined" size="small" 
                         value={this.state.hoursValue}
                         onChange={this._handleTextFieldChange.bind(this)}/>

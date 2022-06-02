@@ -11,10 +11,9 @@ from schedulio.api.schedule.database import (
 )
 from schedulio.api.schedule.schedule import (
     get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, 
-    send_multiple_guest_votes,
+    send_multiple_guest_votes, find_schedule_match_most_participants
 )
 from schedulio.api.schedule.calendar import get_more_votes
-from schedulio.api.schedule.match import find_schedule_match_most_participants
 
 
 def setup_endpoints(app: FastAPI):
