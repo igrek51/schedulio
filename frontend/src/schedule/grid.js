@@ -33,6 +33,9 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
     } else if (value === 'no') {
         td.style.color = '#AC322C'
         td.style.background = '#EA9999'
+    } else if (value === 'maybe') {
+        td.style.color = '#71A1D2'
+        td.style.background = '#EEF4FB'
     } else if (value === '' || !value) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'

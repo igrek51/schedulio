@@ -151,9 +151,9 @@ export class ScheduleGrid extends React.Component<any, any> {
                         hidden: isSelectedHeader,
                     },
                     vote_maybe: {
-                        name: 'Empty (Maybe)',
+                        name: 'Maybe',
                         callback(_key: any, _selection: any, _clickEvent: any) {
-                            GridService.setSelectedCells('')
+                            GridService.setSelectedCells('maybe')
                         },
                         hidden: isSelectedHeader,
                     },
@@ -161,6 +161,13 @@ export class ScheduleGrid extends React.Component<any, any> {
                         name: 'No (I can\'t)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('no')
+                        },
+                        hidden: isSelectedHeader,
+                    },
+                    vote_clear: {
+                        name: 'Clear',
+                        callback(_key: any, _selection: any, _clickEvent: any) {
+                            GridService.setSelectedCells('')
                         },
                         hidden: isSelectedHeader,
                     },

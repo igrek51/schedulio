@@ -107,13 +107,12 @@ def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
 
 
 def validate_answer(answer: str):
-    if answer in ('ok', 'no', ''):
+    if answer in ('ok', 'no', 'maybe', ''):
         return
     try:
         _parse_time_range(answer)
     except Exception as e:
-        raise ValueError(f'Invalid answer: {e}')
-    raise ValueError(f'Invalid answer: {answer}')
+        raise ValueError(f'Invalid answer: {e}') from e
 
 
 def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.BestMatch]:

@@ -66,7 +66,8 @@ export class BestMatchView extends React.Component<any, any> {
                 return 100
             },
             cells: cells,
-            fixedRowsTop: 1,
+            fixedColumnsStart: 0,
+            fixedRowsTop: 0,
             rowHeights: 40,
             className: 'htCenter htMiddle',
             manualColumnResize: true,

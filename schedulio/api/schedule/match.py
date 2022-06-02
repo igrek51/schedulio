@@ -101,8 +101,12 @@ def _find_best_time_match(
 
     for guest_id in guest_ids:
         answer = guest_votes.get(guest_id)
-        if answer is None or answer == '':
+        if answer is None:
             answer = ''
+            
+        if answer == '':
+            uncertain_guests += 1
+        elif answer == 'maybe':
             uncertain_guests += 1
         elif answer == 'ok':
             certain_guests += 1
@@ -186,7 +190,7 @@ def _parse_time_range(string: str) -> TimeRange:
             end_time=end_time,
         )
 
-    match = re.fullmatch(r'(\S+) *(\+|\-)', string)
+    match = re.fullmatch(r'(\S+) *(\+)', string)
     if match:
         start = match.group(1)
         start_time = _parse_time(start)
@@ -199,7 +203,7 @@ def _parse_time_range(string: str) -> TimeRange:
 
 
 def _parse_time(stime: str) -> time:
-    match = re.fullmatch(r'(\d+):(\d+)', stime)
+    match = re.fullmatch(r'(\d{1,2}):(\d{1,2})', stime)
     if match:
         hour = int(match.group(1))
         assert 0 <= hour <= 24, 'hour should be between 0-24'
@@ -211,7 +215,7 @@ def _parse_time(stime: str) -> time:
             minute = 59
         return time(hour=hour, minute=minute, tzinfo=pytz.UTC)
 
-    match = re.fullmatch(r'(\d+)', stime)
+    match = re.fullmatch(r'(\d{1,2})', stime)
     if match:
         hour = int(match.group(1))
         assert 0 <= hour <= 24, 'hour should be between 0-24'

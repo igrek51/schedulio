@@ -55,7 +55,7 @@ function ScheduleView() {
 
                 <ScheduleTitleView ref={titleRef}/>
 
-                <div>
+                <div className="ms-1">
                     Select cells and mark your availability.
                 </div>
 
@@ -67,8 +67,8 @@ function ScheduleView() {
                                     <CheckIcon fontSize="small"/> OK
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="Vote for &quot;Maybe&quot; (empty cell, default answer) in selected days" arrow>
-                                <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
+                            <Tooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow>
+                                <Button variant="outlined" onClick={() => { GridService.setSelectedCells('maybe'); }}>
                                     <QuestionMarkIcon fontSize="small"/> Maybe
                                 </Button>
                             </Tooltip>
@@ -84,7 +84,7 @@ function ScheduleView() {
                         <TimeRangeField ref={hoursFieldRef}/>
                     </div>
 
-                    <div className="d-inline-block ms-3 mt-2">
+                    <div className="d-inline-block ms-2 mt-2">
                         <NewGuestView scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>

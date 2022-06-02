@@ -8,7 +8,7 @@ export class ScheduleTitleView extends React.Component<any, any> {
 
     render() {
         return (
-            <h2 id="schedule-title">{this.state.title}</h2>
+            <h2 id="schedule-title" className="ms-2">{this.state.title}</h2>
         )
     }
 }
