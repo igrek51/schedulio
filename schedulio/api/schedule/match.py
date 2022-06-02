@@ -195,7 +195,7 @@ def _parse_time_range(string: str) -> TimeRange:
             end_time=time(hour=23, minute=59, tzinfo=pytz.UTC),
         )
 
-    raise ValueError(f'Invalid time range format: {string}')
+    raise ValueError(f'Invalid time range format: "{string}"')
 
 
 def _parse_time(stime: str) -> time:

@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.calendar import days_range, get_day_name
-from schedulio.api.schedule.match import find_match_most_participants
+from schedulio.api.schedule.match import _parse_time_range, find_match_most_participants
 from schedulio.djangoapp import models
 from schedulio.api.schedule.converters import (
     guests_model_to_schema, schedule_model_to_schema, vote_model_to_schema, votes_model_to_schema,
@@ -72,6 +72,7 @@ def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
 
 
 def send_guest_vote(guest_id: str, vote: schemas.Vote) -> Optional[schemas.Vote]:
+    validate_answer(vote.answer)
     guest_model = find_guest_by_id(guest_id)
     day_timestamp = round_timestamp_to_day(vote.day)
     vote_model = create_or_update_vote(guest_model, day_timestamp, vote.answer)
@@ -82,11 +83,23 @@ def send_guest_vote(guest_id: str, vote: schemas.Vote) -> Optional[schemas.Vote]
 
 
 def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
+    for vote in votes:
+        validate_answer(vote.answer)
     guest_model = find_guest_by_id(guest_id)
     for vote in votes:
         day_timestamp = round_timestamp_to_day(vote.day)
         create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)
+
+
+def validate_answer(answer: str):
+    if answer in ('ok', 'no', ''):
+        return
+    try:
+        _parse_time_range(answer)
+    except Exception as e:
+        raise ValueError(f'Invalid answer: {e}')
+    raise ValueError(f'Invalid answer: {answer}')
 
 
 def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.BestMatch]:

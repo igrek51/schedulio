@@ -211,6 +211,9 @@ export class GridService {
 
         const guest = this.guestsById[guestId]
         let firstAnswer = votes[0].answer
+        if (firstAnswer === '') {
+            firstAnswer = '(empty)'
+        }
     
         axios.post(`/api/guest/${guestId}/votes`, votes)
             .then(response => {

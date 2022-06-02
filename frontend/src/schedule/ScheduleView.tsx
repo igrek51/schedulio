@@ -62,17 +62,17 @@ function ScheduleView() {
                 <div className="mb-3">
                     <div className="d-inline-block mx-1 mt-2">
                         <ButtonGroup>
-                            <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
+                            <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow>
                                 <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
                                     <CheckIcon fontSize="small"/> OK
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="Vote for &quot;Maybe&quot; (empty, default answer) in selected days" arrow>
+                            <Tooltip title="Vote for &quot;Maybe&quot; (empty cell, default answer) in selected days" arrow>
                                 <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
                                     <QuestionMarkIcon fontSize="small"/> Maybe
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="Vote for &quot;I can't&quot; in selected days" arrow>
+                            <Tooltip title="Vote for &quot;No&quot; in selected days" arrow>
                                 <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
                                     <CloseIcon fontSize="small"/> No
                                 </Button>
