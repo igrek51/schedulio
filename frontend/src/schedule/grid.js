@@ -14,9 +14,9 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
         td.style.background = '#FFFFFF'
         const dayOfWeek = GridService.timestampToDayOfWeek[value]
         if (dayOfWeek !== undefined) {
-            if (dayOfWeek == 6) {  // saturday
+            if (dayOfWeek === 6) {  // saturday
                 td.style.background = '#FAE8DC'
-            } else if (dayOfWeek == 0) {  // sunday
+            } else if (dayOfWeek === 0) {  // sunday
                 td.style.background = '#FAE8DC'
             }
         }

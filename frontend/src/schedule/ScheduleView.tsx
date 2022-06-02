@@ -82,7 +82,7 @@ function ScheduleView() {
                     </div>
 
                     <div className="d-inline-block mx-1 mt-2">
-                        <NewGuestView/>
+                        <NewGuestView scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>
 

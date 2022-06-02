@@ -19,6 +19,7 @@ export class ScheduleGrid extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
+            constantFocus: true,
         };
         this.hotTableRef = React.createRef<HotTable>();
         this.hoursFieldRef = props.hoursFieldRef;
@@ -26,6 +27,16 @@ export class ScheduleGrid extends React.Component<any, any> {
             ['Day'],
             ['...'],
         ]
+    }
+
+    disableConstantFocus() {
+        this.setState({constantFocus: false});
+        let hot = this.hotTableRef.current!.hotInstance!;
+        hot.deselectCell();
+    }
+
+    enableConstantFocus() {
+        this.setState({constantFocus: true});
     }
 
     setTableData(tableData: string[][]) {
@@ -59,7 +70,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                 const lastRow = hot.countRows() - 1
                 const voteChanges: Array<any> = []
                 changes.forEach(([row, col, oldValue, newValue]) => {
-                    if (newValue != oldValue) {
+                    if (newValue !== oldValue) {
                         if (row > 0 && row < lastRow && col > 0) {
                             voteChanges.push([row, col, newValue])
                         } else if (row === 0 && col > 0) {
@@ -68,7 +79,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                         }
                     }
                 })
-                if (voteChanges.length == 0 && changes.length != voteChanges.length) {
+                if (voteChanges.length === 0 && changes.length !== voteChanges.length) {
                     return
                 }
                 GridService.sendVotes(voteChanges)
@@ -80,7 +91,7 @@ export class ScheduleGrid extends React.Component<any, any> {
             if (selectedLast === undefined) {
                 return false
             }
-            return selectedLast[0] == 0 || selectedLast[1] == 0;
+            return selectedLast[0] === 0 || selectedLast[1] === 0;
         }
 
         function isNotSelectedGuestHeader(this: Handsontable): boolean {
@@ -88,19 +99,19 @@ export class ScheduleGrid extends React.Component<any, any> {
             if (selectedLast === undefined) {
                 return false
             }
-            return selectedLast[0] > 0 || selectedLast[1] == 0;
+            return selectedLast[0] > 0 || selectedLast[1] === 0;
         }
 
         function deleteSelectedGuest(hot: Handsontable) {
             const selected = hot.getSelected() || []
-            if (selected.length == 0) {
+            if (selected.length === 0) {
                 return
             }
             if (selected.length > 1) {
                 ToastService.toastError('Please select only one guest')
                 return
             }
-            const [row1, column1, row2, column2] = selected[0]
+            const [_row1, column1, _row2, _column2] = selected[0]
             const guestIndex = column1 - 1
             GridService.deleteGuest(guestIndex)
         }
@@ -162,7 +173,9 @@ export class ScheduleGrid extends React.Component<any, any> {
                     },
                 },
             },
-            outsideClickDeselects: false,
+            outsideClickDeselects(event) {
+                return !self.state.constantFocus;
+            },
             selectionMode: 'multiple',
             afterSelection: function (row: number, column: number, row2: number, column2: number, preventScrolling: any, selectionLayerLevel: any) {
                 afterSelection(this, row, column, row2, column2, preventScrolling, selectionLayerLevel)

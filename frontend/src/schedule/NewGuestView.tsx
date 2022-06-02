@@ -9,29 +9,43 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import AddIcon from '@mui/icons-material/Add';
 import { GridService } from "./GridService";
+import { ToastService } from "./ToastService";
 
-export default function NewGuestView() {
+export default function NewGuestView(props: any) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
+    const inputReference = React.useRef<any>(null);
 
     const handleClickOpen = () => {
+        props.scheduleGridRef.current!.disableConstantFocus()
         setOpen(true);
         setName('');
     };
 
     const handleClose = () => {
         setOpen(false);
+        props.scheduleGridRef.current!.enableConstantFocus()
     };
 
     const confirmAdding = () => {
-        GridService.addNewGuest(name);
+        if (name.length === 0) {
+            ToastService.toastError('Name was not given');
+        } else {
+            GridService.addNewGuest(name);
+        }
         handleClose();
     };
 
     const _handleTextFieldChange = (e: any) => {
         setName(e.target.value);
     };
+
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            confirmAdding();
+        }
+    }
 
     return (
         <div>
@@ -48,13 +62,15 @@ export default function NewGuestView() {
                         Enter your name:
                     </DialogContentText>
                     <TextField
+                        ref={inputReference}
                         autoFocus
                         margin="dense"
-                        id="name"
+                        id="inputGuestName"
                         label="Name"
                         fullWidth
                         variant="standard"
                         value={name} onChange={_handleTextFieldChange}
+                        onKeyDown={handleKeyDown} 
                     />
                 </DialogContent>
                 <DialogActions>
