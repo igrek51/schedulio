@@ -16,9 +16,11 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import CloseIcon from '@mui/icons-material/Close';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import NewGuestView from './NewGuestView';
+import { activateBootstrapTooltips } from './grid.js';
 
 
 function ScheduleView() {
+    console.log('rendering ScheduleView...');
 
     const titleRef = React.createRef<ScheduleTitleView>();
     const scheduleGridRef = React.createRef<ScheduleGrid>();
@@ -28,7 +30,6 @@ function ScheduleView() {
     const { scheduleId } = useParams();
     GridService.scheduleId = scheduleId!;
 
-    console.log('ScheduleView is rendering');
 
     const onTitleLoad = (title: string) => {
         titleRef.current!.setState({title: title});
@@ -43,6 +44,8 @@ function ScheduleView() {
         GridService.hotRef = scheduleGridRef.current!.hotTableRef;
 
         GridService.fetchData(onTitleLoad, onBestMatchLoad);
+
+        activateBootstrapTooltips()
     }, []);
 
     return (
@@ -91,7 +94,9 @@ function ScheduleView() {
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4><StarBorderIcon fontSize="large"/> Best match</h4>
+                    <h4 data-bs-toggle="tooltip" data-bs-placement="left" title="Best match with the most certain participants">
+                        <StarBorderIcon fontSize="large"/> Best match
+                    </h4>
                     <BestMatchView ref={bestMatchRef}/>
                 </div>
 

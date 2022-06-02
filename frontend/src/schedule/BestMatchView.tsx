@@ -49,11 +49,7 @@ export class BestMatchView extends React.Component<any, any> {
     render() {
         function cells(row: number, col: number, prop: string | number): any {
             const cellProperties = { readOnly: false, renderer: bestmatchCellRenderer };
-            if (col === 0) {
-                cellProperties.readOnly = true
-            } else {
-                cellProperties.readOnly = false
-            }
+            cellProperties.readOnly = true
             return cellProperties
         }
 

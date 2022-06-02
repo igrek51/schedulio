@@ -49,6 +49,7 @@ export class GridService {
     static hotRef: React.RefObject<HotTable>;
     static scheduleGridRef: React.RefObject<ScheduleGrid>;
     static timestampToDayOfWeek: Record<string, number> = {};
+    static bestMatchDayName: string = '';
 
     static fetchData(
         onTitleLoad: (title: string) => void,
@@ -93,6 +94,9 @@ export class GridService {
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
             .then(response => {
                 let bestMatch = response.data
+                this.bestMatchDayName = bestMatch.day_name
+                let hot = this.hotRef.current!.hotInstance!;
+                hot.render()
                 onBestMatchLoad(bestMatch)
 
             }).catch(err => {

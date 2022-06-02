@@ -190,7 +190,7 @@ export class ScheduleGrid extends React.Component<any, any> {
             <HotTable
                 settings={hotSettings}
                 ref={this.hotTableRef}
-            />
+                />
         );
     }
 }
