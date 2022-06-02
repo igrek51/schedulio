@@ -65,7 +65,7 @@ def delete_guest(guest: models.Guest):
     trim_old_votes_today()
     guest_votes = list_votes_by_guest(guest)
     if guest_votes:
-        raise ValueError(f'Guest {guest.name} has {len(guest_votes)} votes. Please remove them first.')
+        raise ValueError(f'Guest {guest.name} has {len(guest_votes)} non-empty votes. Please remove them first.')
     guest.delete()
 
 

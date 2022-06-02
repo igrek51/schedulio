@@ -60,8 +60,9 @@ export class GridService {
             .then(response => {
                 this.title = response.data.title;
                 onTitleLoad(this.title);
-            }).catch(response => {
-                ToastService.toastError(`Fetching schedule: ${response}`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Fetching schedule`, err)
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/guest`)
@@ -74,8 +75,9 @@ export class GridService {
                 })
                 this.guests = guests
                 this.refreshAllVotes()
-            }).catch(response => {
-                ToastService.toastError(`Fetching guests: ${response}`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Fetching guests`, err)
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/votes`)
@@ -83,16 +85,18 @@ export class GridService {
                 let dayVotes = response.data.day_votes
                 this.dayVotes = dayVotes
                 this.refreshAllVotes()
-            }).catch(response => {
-                ToastService.toastError(`Fetching votes: ${response}`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Fetching votes`, err)
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
             .then(response => {
                 let bestMatch = response.data
                 onBestMatchLoad(bestMatch)
-            }).catch(response => {
-                ToastService.toastError(`Fetching matches: ${response}`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Fetching matches`, err)
             });
     }
 
@@ -157,8 +161,8 @@ export class GridService {
                 hot.updateData(tableData)
                 hot.render()
                 
-            }).catch(response => {
-                ToastService.toastError(`Loading more days: ${response}`);
+            }).catch(err => {
+                ToastService.showAxiosError(`Loading more days`, err)
             });
     }
 
@@ -212,8 +216,8 @@ export class GridService {
                 ToastService.toastSuccess(msg);
                 console.log(msg)
                 
-            }).catch(response => {
-                ToastService.toastError(`Sending votes: ${response}`);
+            }).catch(err => {
+                ToastService.showAxiosError(`Sending votes`, err)
             });
     }
 
@@ -231,8 +235,8 @@ export class GridService {
                 ToastService.toastSuccess(`Added new guest: ${name}`);
                 this.refreshAllVotes()
 
-            }).catch(response => {
-                ToastService.toastError(`Creating guest: ${response}`);
+            }).catch(err => {
+                ToastService.showAxiosError(`Creating guest`, err)
             });
     }
 
@@ -245,8 +249,8 @@ export class GridService {
                 console.log(`Guest "${oldName}" renamed to "${newName}"`)
                 ToastService.toastSuccess(`Guest "${oldName}" renamed to "${newName}"`);
 
-            }).catch(response => {
-                ToastService.toastError(`Renaming guest: ${response}`);
+            }).catch(err => {
+                ToastService.showAxiosError(`Renaming guest`, err)
             });
     }
 
@@ -262,8 +266,8 @@ export class GridService {
                 ToastService.toastSuccess(`Guest "${guest.name}" has been deleted`);
                 this.refreshAllVotes()
 
-            }).catch(response => {
-                ToastService.toastError(`Deleting guest: ${response}`);
+            }).catch(err => {
+                ToastService.showAxiosError(`Deleting guest`, err)
             });
     }
 

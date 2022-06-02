@@ -37,5 +37,18 @@ export class ToastService {
             progress: undefined,
         });
     }
+
+    static showAxiosError(context: string, err: any) {
+        if (err.response.hasOwnProperty('data')){
+            const data = err.response.data
+            if (data.hasOwnProperty('error')){
+                const errorDetails = data.error
+                this.toastError(`${context}: ${errorDetails}`);
+                return
+            }
+        }
+
+        this.toastError(`${context}: ${err}`);
+    }
     
 }
