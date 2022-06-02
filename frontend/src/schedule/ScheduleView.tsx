@@ -94,7 +94,7 @@ function ScheduleView() {
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4 data-bs-toggle="tooltip" data-bs-placement="left" title="Best match with the most certain participants">
+                    <h4 data-toggle="tooltip" data-placement="left" title="Best match with the most confirmed participants">
                         <StarBorderIcon fontSize="large"/> Best match
                     </h4>
                     <BestMatchView ref={bestMatchRef}/>

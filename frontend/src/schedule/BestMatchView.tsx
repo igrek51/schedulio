@@ -28,10 +28,15 @@ export class BestMatchView extends React.Component<any, any> {
         }
 
         let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
+        if (bestMatch.min_guests == bestMatch.max_guests) {
+            var participantsCell = `${bestMatch.min_guests} / ${bestMatch.total_guests}`
+        } else {
+            var participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
+        }
         let resultRow = [
             bestMatch.day_name,
             timerange,
-            `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`,
+            participantsCell,
         ]
         for (const vote of bestMatch.guest_votes) {
             resultRow.push(vote)

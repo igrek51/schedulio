@@ -2,7 +2,7 @@ import React from "react";
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
-import { cellRenderer } from './grid.js';
+import { cellRenderer, activateBootstrapTooltips } from './grid.js';
 import { GridService } from './GridService';
 import { TimeRangeField } from "./TimeRangeField";
 import { ToastService } from "./ToastService";
@@ -189,6 +189,14 @@ export class ScheduleGrid extends React.Component<any, any> {
             },
             afterSetDataAtCell: function (changes: Array<any>) {
                 afterSetDataAtCell(this, changes);
+            },
+            afterInit: function () {
+                activateBootstrapTooltips()
+            },
+            afterViewRender: function (isForced: boolean) {
+                if (isForced) {
+                    activateBootstrapTooltips()
+                }
             },
             licenseKey: 'non-commercial-and-evaluation',
         };
