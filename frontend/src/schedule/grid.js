@@ -32,7 +32,7 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
         let tooltip = ''
 
         if (row === 1) {
-            tooltip = 'Next days shift automatically each day'
+            tooltip = 'Today (next days shift automatically each day)'
         }
         if (row === instance.countRows() - 1) {
             tooltip = 'Click to show more days'

@@ -33,10 +33,15 @@ def setup_endpoints(app: FastAPI):
         return get_schedule_schema(schedule_id)
 
     @app.put("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
-    def _update_schedule(schedule_id: str, schedule: schemas.Schedule):
+    def _update_schedule(schedule_id: str, new_schedule: schemas.Schedule):
         schedule_model = find_schedule_by_path_id(schedule_id)
-        update_schedule(schedule_model, schedule.title, schedule.description, schedule.options)
+        update_schedule(schedule_model, new_schedule)
         return schedule_model_to_schema(schedule_model)
+
+    @app.delete("/api/schedule/{schedule_id}")
+    def _delete_schedule(schedule_id: str, new_schedule: schemas.Schedule):
+        schedule_model = find_schedule_by_path_id(schedule_id)
+        delete_schedule(schedule_model)
 
 
     @app.get("/api/schedule/{schedule_id}/guest", response_model=List[schemas.Guest])

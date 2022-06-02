@@ -23,24 +23,41 @@ def find_schedule_by_path_id(path_id: str) -> models.Schedule:
 
 
 def create_new_schedule(schedule: schemas.ScheduleCreate) -> models.Schedule:
+    assert schedule.title, 'Schedule title is required'
+    if schedule.path_id is not None:
+        assert schedule.path_id, 'Path id cannot be empty'
+
     new_model = models.Schedule(
         title=schedule.title,
         description=schedule.description,
+        path_id=schedule.path_id,
+        options=schedule.options,
     )
     new_model.save()
     return new_model
 
 
 def update_schedule(
-    schedule: models.Schedule, 
-    title: str,
-    description: Optional[str],
-    options: Optional[str],
+    schedule: models.Schedule,
+    new_schedule: schemas.Schedule,
 ):
-    schedule.title = title
-    schedule.description = description
-    schedule.options = options
+    assert new_schedule.title, 'Schedule title is required'
+    schedule.title = new_schedule.title
+
+    if new_schedule.path_id is not None:
+        assert new_schedule.path_id, 'Path id cannot be empty'
+        schedule.path_id = new_schedule.path_id
+    if new_schedule.description is not None:
+        schedule.description = new_schedule.description
+    if new_schedule.options is not None:
+        schedule.options = new_schedule.options
+
     schedule.save()
+
+
+def delete_schedule(schedule: models.Schedule):
+    schedule.delete()
+    log.info('schedule deleted', id=schedule.id, path_id=schedule.path_id, title=schedule.title)
 
 
 def list_guests_by_schedule(schedule: models.Schedule) -> List[models.Guest]:
@@ -66,14 +83,17 @@ def create_new_guest(schedule: models.Schedule, guest: schemas.GuestCreate) -> m
 def update_guest(guest: models.Guest, name: str):
     guest.name = name
     guest.save()
+    log.info('guest updated', new_name=name, guest_id=guest.id)
 
 
 def delete_guest(guest: models.Guest):
     trim_old_votes_today()
+    schedule_id = guest.schedule.id
     guest_votes = list_votes_by_guest(guest)
     if guest_votes:
         raise ValueError(f'Guest {guest.name} has {len(guest_votes)} non-empty votes. Please remove them first.')
     guest.delete()
+    log.info('guest deleted', id=guest.id, name=guest.name, schedule_id=schedule_id)
 
 
 def update_guest_last_update(guest: models.Guest):

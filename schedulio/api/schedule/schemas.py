@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 class ScheduleCreate(BaseModel):
     title: str
+    path_id: Union[str, None] = None
+    options: Union[str, None] = None
     description: Union[str, None] = None
 
 
