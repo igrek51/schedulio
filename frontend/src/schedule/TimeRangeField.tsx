@@ -30,8 +30,8 @@ export class TimeRangeField extends React.Component<any, any> {
             <span>
                 <Tooltip title="Type hours in 'HH-HH' format, 'HH:MM - HH:MM' or 'HH+'" arrow>
                     <TextField label="Availability Hours" variant="outlined" size="small" 
-                        value={this.state.hoursValue}
-                        onChange={this._handleTextFieldChange.bind(this)}/>
+                        value={this.state.hoursValue} onChange={this._handleTextFieldChange.bind(this)}
+                        />
                 </Tooltip>
                 <ButtonGroup>
                     <Tooltip title="Specify availability hours in selected days" arrow>

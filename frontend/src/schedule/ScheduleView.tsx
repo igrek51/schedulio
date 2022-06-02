@@ -15,6 +15,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import CloseIcon from '@mui/icons-material/Close';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import NewGuestView from './NewGuestView';
 
 
 function ScheduleView() {
@@ -47,7 +48,7 @@ function ScheduleView() {
     return (
         <div className="mt-3">
             <ToastContainer />
-            <Container maxWidth="lg">
+            <Container maxWidth="lg" disableGutters>
 
                 <ScheduleTitleView ref={titleRef}/>
 
@@ -55,27 +56,34 @@ function ScheduleView() {
                     Select cells and mark your availability.
                 </div>
 
-                <div className="mt-2 mb-3">
-                    <ButtonGroup>
-                        <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
-                            <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
-                                <CheckIcon fontSize="small"/> OK
-                            </Button>
-                        </Tooltip>
-                        <Tooltip title="Vote for &quot;Maybe&quot; (empty cell) in selected days" arrow>
-                            <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
-                                <QuestionMarkIcon fontSize="small"/> Maybe
-                            </Button>
-                        </Tooltip>
-                        <Tooltip title="Vote for &quot;I can't&quot; in selected days" arrow>
-                            <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
-                                <CloseIcon fontSize="small"/> No
-                            </Button>
-                        </Tooltip>
-                    </ButtonGroup>
+                <div className="mb-3">
+                    <div className="d-inline-block mx-1 mt-2">
+                        <ButtonGroup>
+                            <Tooltip title="Vote for &quot;Available&quot; in selected days" arrow>
+                                <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
+                                    <CheckIcon fontSize="small"/> OK
+                                </Button>
+                            </Tooltip>
+                            <Tooltip title="Vote for &quot;Maybe&quot; (empty, default answer) in selected days" arrow>
+                                <Button variant="outlined" onClick={() => { GridService.setSelectedCells(''); }}>
+                                    <QuestionMarkIcon fontSize="small"/> Maybe
+                                </Button>
+                            </Tooltip>
+                            <Tooltip title="Vote for &quot;I can't&quot; in selected days" arrow>
+                                <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
+                                    <CloseIcon fontSize="small"/> No
+                                </Button>
+                            </Tooltip>
+                        </ButtonGroup>
+                    </div>
 
-                    <span className="ms-2"></span>
-                    <TimeRangeField ref={hoursFieldRef}/>
+                    <div className="d-inline-block mx-1 mt-3">
+                        <TimeRangeField ref={hoursFieldRef}/>
+                    </div>
+
+                    <div className="d-inline-block mx-1 mt-2">
+                        <NewGuestView/>
+                    </div>
                 </div>
 
                 <div className="grid-container">

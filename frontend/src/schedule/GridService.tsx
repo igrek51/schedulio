@@ -141,13 +141,12 @@ export class GridService {
         for (const guest of this.guests) {
             headerRow.push(guest.name)
         }
-        headerRow.push('')
-        let guestEmptyColumns = Array(guestsNum + 1).fill('')
+        let guestEmptyColumns = Array(guestsNum).fill('')
     
         let tableData = [headerRow]
         for (const dayVote of this.dayVotes) {
     
-            let guestCells = Array(guestsNum + 1).fill('')
+            let guestCells = Array(guestsNum).fill('')
             for (const [guestId, answer] of Object.entries(dayVote.guest_votes)) {
                 const guestIndex = this.guestIdToIndex[guestId]
                 guestCells[guestIndex] = answer
@@ -175,7 +174,7 @@ export class GridService {
             .then(response => {
 
                 let guestsNum = this.guests.length
-                let guestEmptyColumns = Array(guestsNum + 1).fill('')
+                let guestEmptyColumns = Array(guestsNum).fill('')
         
                 const batchVotes = response.data.day_votes
 
@@ -210,7 +209,7 @@ export class GridService {
                     self.guestIdToIndex[guest.id] = i
                 })
                 console.log('new guest created:', name)
-                this.toastSuccess(`Added new participant: ${name}`);
+                this.toastSuccess(`Added new guest: ${name}`);
                 this.refreshAllVotes()
 
             }).catch(response => {
@@ -267,8 +266,8 @@ export class GridService {
         axios.put(`/api/guest/${guest.id}`, {name: newName})
             .then(response => {
                 guest.name = newName
-                console.log(`Participant "${oldName}" renamed to "${newName}"`)
-                this.toastSuccess(`Participant "${oldName}" renamed to "${newName}"`);
+                console.log(`Guest "${oldName}" renamed to "${newName}"`)
+                this.toastSuccess(`Guest "${oldName}" renamed to "${newName}"`);
 
             }).catch(response => {
                 this.toastError(`Renaming guest: ${response}`);
@@ -283,7 +282,7 @@ export class GridService {
         let hot = this.hotRef.current!.hotInstance!;
         hot.suspendRender()
         const selected = hot.getSelected() || []
-        const lastCol = hot.countCols() - 2
+        const lastCol = hot.countCols() - 1
         const lastRow = hot.countRows() - 2
     
         for (let index = 0; index < selected.length; index += 1) {

@@ -8,10 +8,7 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
         td.style.color = '#000000'
         td.style.background = '#F8F9FA'
         td.style.fontWeight = 'bold'
-        if (col === instance.countCols() - 1) {
-            td.innerHTML = 'New guest'
-            td.style.fontWeight = 'normal'
-        }
+        // td.innerHTML = '<u>value</u>'
     } else if (col === 0) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'

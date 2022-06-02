@@ -22,8 +22,8 @@ export class ScheduleGrid extends React.Component<any, any> {
         this.hotTableRef = React.createRef<HotTable>();
         this.hoursFieldRef = props.hoursFieldRef;
         this.tableData = [
-            ['Day', ''],
-            ['...', ''],
+            ['Day'],
+            ['...'],
         ]
     }
 
@@ -55,15 +55,12 @@ export class ScheduleGrid extends React.Component<any, any> {
 
         function afterSetDataAtCell(hot: any, changes: Array<any>) {
             if (changes) {
-                const lastCol = hot.countCols() - 1
                 const lastRow = hot.countRows() - 1
                 const voteChanges: Array<any> = []
                 changes.forEach(([row, col, oldValue, newValue]) => {
-                    if (row === 0 && col === lastCol && newValue) {
-                        GridService.addNewGuest(newValue)
-                    } else if (row > 0 && row < lastRow && col > 0 && col < lastCol) {
+                    if (row > 0 && row < lastRow && col > 0) {
                         voteChanges.push([row, col, newValue])
-                    } else if (row === 0 && col > 0 && col < lastCol) {
+                    } else if (row === 0 && col > 0) {
                         GridService.renameGuest(col - 1, newValue)
                     }
                 })
