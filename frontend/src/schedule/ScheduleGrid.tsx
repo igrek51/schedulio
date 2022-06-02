@@ -13,7 +13,7 @@ export class ScheduleGrid extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
     hoursFieldRef: React.RefObject<TimeRangeField>;
-    tableData: Array<Array<string>>;
+    tableData: string[][];
 
     constructor(props: any) {
         super(props);
@@ -27,7 +27,7 @@ export class ScheduleGrid extends React.Component<any, any> {
         ]
     }
 
-    setTableData(tableData: Array<Array<string>>) {
+    setTableData(tableData: string[][]) {
         this.tableData = tableData
         let hot = this.hotTableRef.current!.hotInstance!;
         hot.updateData(tableData)

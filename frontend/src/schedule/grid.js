@@ -1,4 +1,6 @@
 import * as Handsontable from 'handsontable/dist/handsontable.full.min.js';
+import { GridService } from './GridService';
+
 
 export function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -13,6 +15,14 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
     } else if (col === 0) {
         td.style.color = '#000000'
         td.style.background = '#FFFFFF'
+        const dayOfWeek = GridService.timestampToDayOfWeek[value]
+        if (dayOfWeek !== undefined) {
+            if (dayOfWeek == 6) {  // saturday
+                td.style.background = '#FAE8DC'
+            } else if (dayOfWeek == 0) {  // sunday
+                td.style.background = '#FAE8DC'
+            }
+        }
     } else if (value === 'ok') {
         td.style.color = '#38782E'
         td.style.background = '#D9EAD3'

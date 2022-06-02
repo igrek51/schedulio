@@ -48,6 +48,7 @@ export class GridService {
     static guestIdToIndex: Record<string, number> = {};
     static hotRef: React.RefObject<HotTable>;
     static scheduleGridRef: React.RefObject<ScheduleGrid>;
+    static timestampToDayOfWeek: Record<string, number> = {};
 
     static toastInfo(msg: string) {
         toast.info(msg, {
@@ -152,6 +153,7 @@ export class GridService {
                 guestCells[guestIndex] = answer
             }
     
+            this.timestampToDayOfWeek[dayVote.day_name] = dayVote.day_of_week
             const row = [dayVote.day_name].concat(guestCells)
             tableData.push(row)
         }
@@ -181,8 +183,8 @@ export class GridService {
                 const tableData = scheduleGrid.tableData
 
                 tableData.pop()
-                for (let i = 0; i < batchVotes.length; i += 1) {
-                    const dayVote = batchVotes[i]
+                for (const dayVote of batchVotes) {
+                    this.timestampToDayOfWeek[dayVote.day_name] = dayVote.day_of_week
                     this.dayVotes.push(dayVote)
                     tableData.push([dayVote.day_name].concat(guestEmptyColumns))
                 }
@@ -230,9 +232,9 @@ export class GridService {
     
         voteChanges.forEach(([row, col, newValue]) => {
             const guest = this.getGuestByColumn(col)
-            if (guestId == '') {
+            if (guestId === '') {
                 guestId = guest.id
-            } else if (guestId != guest.id) {
+            } else if (guestId !== guest.id) {
                 throw new Error('Found votes for different guests in one batch')
             }
     

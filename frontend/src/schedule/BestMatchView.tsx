@@ -46,8 +46,6 @@ export class BestMatchView extends React.Component<any, any> {
     }
 
     render() {
-        const self = this;
-
         const hotSettings: Handsontable.GridSettings = {
             data: this.tableData,
             rowHeaders: false,

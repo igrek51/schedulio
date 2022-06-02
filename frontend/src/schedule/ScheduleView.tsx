@@ -52,7 +52,7 @@ function ScheduleView() {
                 <ScheduleTitleView ref={titleRef}/>
 
                 <div>
-                    Mark your availability.
+                    Select cells and mark your availability.
                 </div>
 
                 <div className="mt-2 mb-3">
