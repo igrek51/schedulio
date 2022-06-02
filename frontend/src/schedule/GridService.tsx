@@ -210,6 +210,7 @@ export class GridService {
                     self.guestIdToIndex[guest.id] = i
                 })
                 console.log('new guest created:', name)
+                this.toastSuccess(`Added new participant: ${name}`);
                 this.refreshAllVotes()
 
             }).catch(response => {
@@ -252,6 +253,7 @@ export class GridService {
     
         axios.post(`/api/guest/${guestId}/votes`, votes)
             .then(response => {
+                this.toastSuccess(`${votes.length} votes sent.`);
                 console.log(`sent ${votes.length} votes of guest: ${guestId}`)
                 
             }).catch(response => {
@@ -261,10 +263,12 @@ export class GridService {
 
     static renameGuest(guestIndex: any, newName: string) {
         const guest = this.guests[guestIndex]
+        const oldName = guest.name
         axios.put(`/api/guest/${guest.id}`, {name: newName})
             .then(response => {
                 guest.name = newName
-                console.log(`Guest renamed to ${newName}`)
+                console.log(`Participant "${oldName}" renamed to "${newName}"`)
+                this.toastSuccess(`Participant "${oldName}" renamed to "${newName}"`);
 
             }).catch(response => {
                 this.toastError(`Renaming guest: ${response}`);

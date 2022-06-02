@@ -85,6 +85,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                 }
                 return 100
             },
+            fixedColumnsStart: 1,
             fixedRowsTop: 1,
             rowHeights: 40,
             className: 'htCenter htMiddle',
