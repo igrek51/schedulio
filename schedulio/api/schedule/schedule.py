@@ -18,7 +18,7 @@ from schedulio.api.schedule.converters import (
 from schedulio.api.schedule.database import (
     create_or_update_vote,
     find_guest_by_id,
-    find_schedule_by_id,
+    find_schedule_by_path_id,
     list_guests_by_schedule,
     list_votes_by_guest,
     list_votes_by_schedule,
@@ -35,7 +35,7 @@ spare_schedule_days_num = 14
 
 
 def get_schedule_schema(schedule_id: str):
-    schedule_model = find_schedule_by_id(schedule_id)
+    schedule_model = find_schedule_by_path_id(schedule_id)
     return schedule_model_to_schema(schedule_model)
 
 
@@ -50,10 +50,10 @@ def get_guest_votes(guest_id: str) -> List[schemas.Vote]:
 def get_schedule_votes(schedule_id: str) -> schemas.DayVotesBatch:
     trim_old_votes_today()
 
-    schedule_model = find_schedule_by_id(schedule_id)
+    schedule_model = find_schedule_by_path_id(schedule_id)
     votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
 
-    day_to_guest_to_vote = defaultdict(dict)
+    day_to_guest_to_vote: Dict[int, Dict[str, str]] = defaultdict(dict)
 
     min_timestamp: int = local_today_timestamp()
     max_timestamp: int = min_timestamp
@@ -119,9 +119,9 @@ def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.
     trim_old_votes_today()
     today: int = local_today_timestamp()
 
-    schedule_model = find_schedule_by_id(schedule_id)
+    schedule_model = find_schedule_by_path_id(schedule_id)
     votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
-    guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_id))
+    guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_model))
 
     day_guest_vote_map, max_date = group_votes(votes, today)
     max_date = max_date + timedelta(days=1)
@@ -131,7 +131,7 @@ def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.
 
 
 def group_votes(votes: List[models.Vote], today: int) -> Tuple[Dict[int, Dict[str, str]], datetime]:
-    day_guest_vote_map = defaultdict(dict)
+    day_guest_vote_map: Dict[int, Dict[str, str]] = defaultdict(dict)
     max_timestamp: int = today
     for vote in votes:
         day_timestamp = vote.day

@@ -12,7 +12,14 @@ def find_schedule_by_id(id: str) -> models.Schedule:
     try:
         return models.Schedule.objects.get(id=id)
     except models.Schedule.DoesNotExist:
-        raise EntityNotFound(f'Schedule with id {id} was not found')
+        raise EntityNotFound(f'No schedule with id: "{id}"')
+
+
+def find_schedule_by_path_id(path_id: str) -> models.Schedule:
+    try:
+        return models.Schedule.objects.get(path_id=path_id)
+    except models.Schedule.DoesNotExist:
+        raise EntityNotFound(f'No schedule with path id: "{path_id}"')
 
 
 def create_new_schedule(schedule: schemas.ScheduleCreate) -> models.Schedule:

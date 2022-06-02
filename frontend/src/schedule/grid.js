@@ -35,7 +35,7 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
             tooltip = 'Next days shift automatically each day'
         }
         if (row === instance.countRows() - 1) {
-            tooltip = 'Click to get more days'
+            tooltip = 'Click to show more days'
         }
 
         if (GridService.bestMatchDayName !== '' && GridService.bestMatchDayName === value) {
@@ -86,4 +86,5 @@ export function bestmatchCellRenderer(instance, td, row, col, prop, value, cellP
 export function activateBootstrapTooltips() {
     $('[data-toggle="tooltip"]').tooltip()
     $('[data-toggle="tooltip"]').tooltip('hide')
+    $('.tooltip').hide()
 }

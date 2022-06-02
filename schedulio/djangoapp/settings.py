@@ -68,6 +68,7 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = '/admin/login/'
 
-CSRF_TRUSTED_ORIGINS = [
-    os.environ.get('DJANGO_CSRF_TRUSTED_ORIGIN', ''),
-]
+if os.environ.get('DJANGO_CSRF_TRUSTED_ORIGIN'):
+    CSRF_TRUSTED_ORIGINS = [
+        os.environ.get('DJANGO_CSRF_TRUSTED_ORIGIN'),
+    ]

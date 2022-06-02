@@ -6,6 +6,7 @@ from schedulio.djangoapp import models
 def schedule_model_to_schema(model: models.Schedule) -> schemas.Schedule:
     return schemas.Schedule(
         id=model.id,
+        path_id=model.path_id,
         title=model.title,
         description=model.description,
         create_time=model.create_time,

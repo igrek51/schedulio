@@ -6,6 +6,7 @@ from .models import *
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'path_id',
         'title',
         'create_time',
     )

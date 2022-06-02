@@ -9,6 +9,7 @@ class ScheduleCreate(BaseModel):
 
 class Schedule(BaseModel):
     id: str
+    path_id: str
     title: str
     description: Union[str, None] = None
     create_time: int

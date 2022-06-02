@@ -12,6 +12,7 @@ def new_uuid() -> str:
 class Schedule(models.Model):
 
     id = models.CharField(max_length=36, primary_key=True, default=new_uuid)
+    path_id = models.CharField(max_length=64, default=new_uuid)
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=1024, null=True, blank=True)
     create_time = models.IntegerField(default=now_timestamp)

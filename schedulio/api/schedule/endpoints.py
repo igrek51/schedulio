@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from fastapi import FastAPI
 
 from schedulio.api.schedule import schemas
@@ -6,7 +6,7 @@ from schedulio.api.schedule.converters import (
     guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, 
 )
 from schedulio.api.schedule.database import (
-    create_new_guest, create_new_schedule, delete_guest, find_guest_by_id, find_schedule_by_id, 
+    create_new_guest, create_new_schedule, delete_guest, find_guest_by_id, find_schedule_by_path_id, 
     list_guests_by_schedule, update_guest, update_schedule,
 )
 from schedulio.api.schedule.schedule import (
@@ -34,19 +34,20 @@ def setup_endpoints(app: FastAPI):
 
     @app.put("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
     def _update_schedule(schedule_id: str, schedule: schemas.Schedule):
-        schedule_model = find_schedule_by_id(schedule_id)
+        schedule_model = find_schedule_by_path_id(schedule_id)
         update_schedule(schedule_model, schedule.title, schedule.description, schedule.options)
         return schedule_model_to_schema(schedule_model)
 
 
     @app.get("/api/schedule/{schedule_id}/guest", response_model=List[schemas.Guest])
     def _list_schedule_guests(schedule_id: str):
-        guest_models = list_guests_by_schedule(schedule_id)
+        schedule_model = find_schedule_by_path_id(schedule_id)
+        guest_models = list_guests_by_schedule(schedule_model)
         return guests_model_to_schema(guest_models)
 
     @app.post("/api/schedule/{schedule_id}/guest", response_model=schemas.Guest)
     def _create_guest(schedule_id: str, guest: schemas.GuestCreate):
-        schedule_model = find_schedule_by_id(schedule_id)
+        schedule_model = find_schedule_by_path_id(schedule_id)
         guest_model = create_new_guest(schedule_model, guest)
         return guest_model_to_schema(guest_model)
 
@@ -71,7 +72,7 @@ def setup_endpoints(app: FastAPI):
     def _get_guest_votes(guest_id: str):
         return get_guest_votes(guest_id)
 
-    @app.post("/api/guest/{guest_id}/vote", response_model=Optional[schemas.Vote])
+    @app.post("/api/guest/{guest_id}/vote", response_model=schemas.Vote)
     def _send_guest_vote(guest_id: str, vote: schemas.Vote):
         return send_guest_vote(guest_id, vote)
 
