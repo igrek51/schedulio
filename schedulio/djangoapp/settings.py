@@ -69,6 +69,5 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/admin/login/'
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://schedulio.igrek.dev", 
-    "http://schedulio.igrek.dev",
+    os.environ.get('DJANGO_CSRF_TRUSTED_ORIGIN', ''),
 ]

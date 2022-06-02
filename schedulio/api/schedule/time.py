@@ -1,6 +1,10 @@
 from datetime import datetime, timezone
+import os
 
 import pytz
+
+local_timezone_name = os.environ.get('TIME_ZONE', 'Europe/Warsaw')
+local_tz = pytz.timezone(local_timezone_name)
 
 
 def now() -> datetime:
@@ -35,7 +39,6 @@ def utc_today_timestamp() -> int:
 
 
 def local_today_timestamp(now_provider = now) -> int:
-    local_tz = pytz.timezone('Europe/Warsaw')
     now_utc = now_provider()
     now_local = now_utc.astimezone(tz=local_tz)
     local_today_date = datetime(now_local.year, now_local.month, now_local.day, tzinfo=pytz.UTC)
