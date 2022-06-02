@@ -51,7 +51,7 @@ export default function NewGuestView(props: any) {
         <div>
             <ButtonGroup>
                 <Button variant="contained" color="primary" onClick={handleClickOpen}>
-                    <AddIcon fontSize="small" /> New Guest
+                    <AddIcon fontSize="small" /> Add Guest
                 </Button>
             </ButtonGroup>
 

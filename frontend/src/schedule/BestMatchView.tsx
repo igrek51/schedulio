@@ -3,6 +3,7 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { BestMatch } from './GridService';
+import { bestmatchCellRenderer } from "./grid.js";
 
 registerAllModules();
 
@@ -16,7 +17,7 @@ export class BestMatchView extends React.Component<any, any> {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
         this.tableData = [
-            ['Day', 'Time', 'Participants', ''],
+            ['Day', 'Time', 'Participants'],
         ]
     }
 
@@ -46,6 +47,16 @@ export class BestMatchView extends React.Component<any, any> {
     }
 
     render() {
+        function cells(row: number, col: number, prop: string | number): any {
+            const cellProperties = { readOnly: false, renderer: bestmatchCellRenderer };
+            if (col === 0) {
+                cellProperties.readOnly = true
+            } else {
+                cellProperties.readOnly = false
+            }
+            return cellProperties
+        }
+
         const hotSettings: Handsontable.GridSettings = {
             data: this.tableData,
             rowHeaders: false,
@@ -58,6 +69,7 @@ export class BestMatchView extends React.Component<any, any> {
                 }
                 return 100
             },
+            cells: cells,
             fixedRowsTop: 1,
             rowHeights: 40,
             className: 'htCenter htMiddle',

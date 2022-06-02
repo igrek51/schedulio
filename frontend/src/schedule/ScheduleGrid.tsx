@@ -137,28 +137,28 @@ export class ScheduleGrid extends React.Component<any, any> {
             contextMenu: {
                 items: {
                     vote_ok: {
-                        name: 'Set "OK" (I\'m available)',
+                        name: 'OK (I\'m available)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('ok')
                         },
                         hidden: isSelectedHeader,
                     },
                     vote_ok_hours: {
-                        name: 'Specify availability time range',
+                        name: 'Time range (available under condition)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             self.hoursFieldRef.current!.setAvailabilityHours()
                         },
                         hidden: isSelectedHeader,
                     },
                     vote_maybe: {
-                        name: 'Set empty (Maybe)',
+                        name: 'Empty (Maybe)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('')
                         },
                         hidden: isSelectedHeader,
                     },
                     vote_no: {
-                        name: 'Set "No" (I can\'t)',
+                        name: 'No (I can\'t)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('no')
                         },

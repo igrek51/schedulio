@@ -81,7 +81,7 @@ function ScheduleView() {
                         <TimeRangeField ref={hoursFieldRef}/>
                     </div>
 
-                    <div className="d-inline-block mx-1 mt-2">
+                    <div className="d-inline-block ms-3 mt-2">
                         <NewGuestView scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>

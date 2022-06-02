@@ -36,3 +36,14 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
         td.style.fontWeight = 'bold'
     }
 }
+
+export function bestmatchCellRenderer(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (row === 0) {
+        td.style.color = '#000000'
+        td.style.background = '#F8F9FA'
+        td.style.fontWeight = 'bold'
+    } else {
+        td.style.color = '#000000'
+    }
+}
