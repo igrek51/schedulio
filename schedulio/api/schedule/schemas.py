@@ -52,8 +52,8 @@ class BestMatch(BaseModel):
     day_name: str
     start_time: Optional[str]
     end_time: Optional[str]
-    min_guests: int
-    max_guests: int
+    min_guests: int  # confirmed participants
+    max_guests: int  # potential participants
     total_guests: int
     guest_votes: List[str]
     guest_names: List[str]

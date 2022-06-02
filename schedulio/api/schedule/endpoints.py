@@ -11,9 +11,10 @@ from schedulio.api.schedule.database import (
 )
 from schedulio.api.schedule.schedule import (
     get_guest_votes, get_schedule_schema, get_schedule_votes, send_guest_vote, 
-    send_multiple_guest_votes, find_best_match_most_participants,
+    send_multiple_guest_votes,
 )
 from schedulio.api.schedule.calendar import get_more_votes
+from schedulio.api.schedule.match import find_schedule_match_most_participants
 
 
 def setup_endpoints(app: FastAPI):
@@ -85,4 +86,4 @@ def setup_endpoints(app: FastAPI):
 
     @app.get("/api/schedule/{schedule_id}/match/most_participants", response_model=schemas.BestMatch)
     def _find_best_match_most_participants(schedule_id: str):
-        return find_best_match_most_participants(schedule_id)
+        return find_schedule_match_most_participants(schedule_id)

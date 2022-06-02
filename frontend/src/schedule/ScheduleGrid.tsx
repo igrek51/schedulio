@@ -3,7 +3,7 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { cellRenderer } from './grid.js';
-import { GridService, BestMatch } from './GridService';
+import { GridService } from './GridService';
 import { TimeRangeField } from "./TimeRangeField.js";
 
 registerAllModules();
@@ -78,7 +78,7 @@ export class ScheduleGrid extends React.Component<any, any> {
             rowHeaders: false,
             colHeaders: false,
             width: 'auto',
-            height: 'auto',
+            height: '60vh',
             colWidths(index: number) {
                 if (index === 0) {
                     return 150
@@ -93,25 +93,25 @@ export class ScheduleGrid extends React.Component<any, any> {
             contextMenu: {
                 items: {
                     vote_ok: {
-                        name: 'ok',
+                        name: 'OK - I\'m available',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('ok')
                         }
                     },
                     vote_ok_hours: {
-                        name: 'ok with hours',
+                        name: 'OK within time range',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             self.hoursFieldRef.current!.setAvailabilityHours()
                         }
                     },
                     vote_maybe: {
-                        name: '(maybe)',
+                        name: '(empty) - maybe',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('')
                         }
                     },
                     vote_no: {
-                        name: 'no',
+                        name: 'No - I can\'t',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('no')
                         }
@@ -130,12 +130,10 @@ export class ScheduleGrid extends React.Component<any, any> {
         };
 
         return (
-            <div id="scheduleTable">
-                <HotTable
-                    settings={hotSettings}
-                    ref={this.hotTableRef}
-                />
-            </div>
+            <HotTable
+                settings={hotSettings}
+                ref={this.hotTableRef}
+            />
         );
     }
 }
