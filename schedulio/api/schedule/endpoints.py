@@ -6,7 +6,7 @@ from schedulio.api.schedule.converters import (
     guest_model_to_schema, guests_model_to_schema, schedule_model_to_schema, 
 )
 from schedulio.api.schedule.database import (
-    create_new_guest, create_new_schedule, find_guest_by_id, find_schedule_by_id, 
+    create_new_guest, create_new_schedule, delete_guest, find_guest_by_id, find_schedule_by_id, 
     list_guests_by_schedule, update_guest, update_schedule,
 )
 from schedulio.api.schedule.schedule import (
@@ -60,6 +60,11 @@ def setup_endpoints(app: FastAPI):
         guest_model = find_guest_by_id(guest_id)
         update_guest(guest_model, guest.name)
         return guest_model_to_schema(guest_model)
+
+    @app.delete("/api/guest/{guest_id}")
+    def _delete_guest(guest_id: str):
+        guest_model = find_guest_by_id(guest_id)
+        delete_guest(guest_model)
 
 
     @app.get("/api/guest/{guest_id}/votes", response_model=List[schemas.Vote])

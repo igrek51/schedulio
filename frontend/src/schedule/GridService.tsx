@@ -1,8 +1,8 @@
 import React from "react";
-import { toast } from 'react-toastify';
 import axios from "axios";
 import { HotTable } from '@handsontable/react';
 import ScheduleGrid from "./ScheduleGrid";
+import { ToastService } from "./ToastService";
 
 
 interface Guest {
@@ -50,42 +50,6 @@ export class GridService {
     static scheduleGridRef: React.RefObject<ScheduleGrid>;
     static timestampToDayOfWeek: Record<string, number> = {};
 
-    static toastInfo(msg: string) {
-        toast.info(msg, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-
-    static toastError(msg: string) {
-        toast.error(msg, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-
-    static toastSuccess(msg: string) {
-        toast.success(msg, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-
     static fetchData(
         onTitleLoad: (title: string) => void,
         onBestMatchLoad: (bestMatch: BestMatch) => void,
@@ -97,7 +61,7 @@ export class GridService {
                 this.title = response.data.title;
                 onTitleLoad(this.title);
             }).catch(response => {
-                this.toastError(`Fetching schedule: ${response}`);
+                ToastService.toastError(`Fetching schedule: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/guest`)
@@ -111,7 +75,7 @@ export class GridService {
                 this.guests = guests
                 this.refreshAllVotes()
             }).catch(response => {
-                this.toastError(`Fetching guests: ${response}`);
+                ToastService.toastError(`Fetching guests: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/votes`)
@@ -120,7 +84,7 @@ export class GridService {
                 this.dayVotes = dayVotes
                 this.refreshAllVotes()
             }).catch(response => {
-                this.toastError(`Fetching votes: ${response}`);
+                ToastService.toastError(`Fetching votes: ${response}`);
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
@@ -128,7 +92,7 @@ export class GridService {
                 let bestMatch = response.data
                 onBestMatchLoad(bestMatch)
             }).catch(response => {
-                this.toastError(`Fetching matches: ${response}`);
+                ToastService.toastError(`Fetching matches: ${response}`);
             });
     }
 
@@ -194,26 +158,7 @@ export class GridService {
                 hot.render()
                 
             }).catch(response => {
-                this.toastError(`Loading more days: ${response}`);
-            });
-    }
-
-    static addNewGuest(name: string) {
-        axios.post(`/api/schedule/${this.scheduleId}/guest`, {name: name})
-            .then(response => {
-
-                this.guests.push(response.data)
-                const self: any = this;
-                this.guests.forEach(function (guest, i) {
-                    self.guestsById[guest.id] = guest
-                    self.guestIdToIndex[guest.id] = i
-                })
-                console.log('new guest created:', name)
-                this.toastSuccess(`Added new guest: ${name}`);
-                this.refreshAllVotes()
-
-            }).catch(response => {
-                this.toastError(`Creating guest: ${response}`);
+                ToastService.toastError(`Loading more days: ${response}`);
             });
     }
 
@@ -229,13 +174,19 @@ export class GridService {
     static sendVotes(voteChanges: Array<any>) {
         const votes: Vote[] = []
         let guestId: string = ''
+
+        if (voteChanges.length === 0) {
+            ToastService.toastError(`You must select at least one cell`);
+            return
+        }
     
-        voteChanges.forEach(([row, col, newValue]) => {
+        for (const [row, col, newValue] of voteChanges) {
             const guest = this.getGuestByColumn(col)
             if (guestId === '') {
                 guestId = guest.id
             } else if (guestId !== guest.id) {
-                throw new Error('Found votes for different guests in one batch')
+                ToastService.toastError(`You can't change answers for multiple guests at once`);
+                return
             }
     
             let answer = newValue
@@ -248,15 +199,40 @@ export class GridService {
                 day: day,
                 answer: answer,
             })
-        })
+        }
+
+        const guest = this.guestsById[guestId]
+        let firstAnswer = votes[0].answer
     
         axios.post(`/api/guest/${guestId}/votes`, votes)
             .then(response => {
-                this.toastSuccess(`${votes.length} votes sent.`);
-                console.log(`sent ${votes.length} votes of guest: ${guestId}`)
+
+                const voteWord = votes.length > 1 ? 'votes' : 'vote'
+                const msg = `${votes.length} ${voteWord} sent by ${guest.name}: ${firstAnswer}`
+                ToastService.toastSuccess(msg);
+                console.log(msg)
                 
             }).catch(response => {
-                this.toastError(`Sending votes: ${response}`);
+                ToastService.toastError(`Sending votes: ${response}`);
+            });
+    }
+
+    static addNewGuest(name: string) {
+        axios.post(`/api/schedule/${this.scheduleId}/guest`, {name: name})
+            .then(response => {
+
+                this.guests.push(response.data)
+                const self: any = this;
+                this.guests.forEach(function (guest, i) {
+                    self.guestsById[guest.id] = guest
+                    self.guestIdToIndex[guest.id] = i
+                })
+                console.log('new guest created:', name)
+                ToastService.toastSuccess(`Added new guest: ${name}`);
+                this.refreshAllVotes()
+
+            }).catch(response => {
+                ToastService.toastError(`Creating guest: ${response}`);
             });
     }
 
@@ -267,10 +243,27 @@ export class GridService {
             .then(response => {
                 guest.name = newName
                 console.log(`Guest "${oldName}" renamed to "${newName}"`)
-                this.toastSuccess(`Guest "${oldName}" renamed to "${newName}"`);
+                ToastService.toastSuccess(`Guest "${oldName}" renamed to "${newName}"`);
 
             }).catch(response => {
-                this.toastError(`Renaming guest: ${response}`);
+                ToastService.toastError(`Renaming guest: ${response}`);
+            });
+    }
+
+    static deleteGuest(guestIndex: number) {
+        const guest = this.guests[guestIndex]
+        axios.delete(`/api/guest/${guest.id}`)
+            .then(response => {
+
+                this.guests.splice(guestIndex, 1)
+                delete this.guestsById[guest.id]
+                delete this.guestIdToIndex[guest.id]
+                console.log(`Guest "${guest.name}" deleted`)
+                ToastService.toastSuccess(`Guest "${guest.name}" has been deleted`);
+                this.refreshAllVotes()
+
+            }).catch(response => {
+                ToastService.toastError(`Deleting guest: ${response}`);
             });
     }
 
@@ -282,22 +275,28 @@ export class GridService {
         let hot = this.hotRef.current!.hotInstance!;
         hot.suspendRender()
         const selected = hot.getSelected() || []
-        const lastCol = hot.countCols() - 1
-        const lastRow = hot.countRows() - 2
+        const minCol = 1
+        const maxCol = hot.countCols() - 1
+        const minRow = 1
+        const maxRow = hot.countRows() - 2
+
+        const changes: Array<[number, number, any]> = []
     
         for (let index = 0; index < selected.length; index += 1) {
             const [row1, column1, row2, column2] = selected[index]
-            const startRow = Math.max(Math.min(row1, row2), 1)
-            const endRow = Math.min(Math.max(row1, row2), lastRow)
-            const startCol = Math.max(Math.min(column1, column2), 1)
-            const endCol = Math.min(Math.max(column1, column2), lastCol)
+            const startRow = Math.max(Math.min(row1, row2), minRow)
+            const endRow = Math.min(Math.max(row1, row2), maxRow)
+            const startCol = Math.max(Math.min(column1, column2), minCol)
+            const endCol = Math.min(Math.max(column1, column2), maxCol)
     
             for (let rowIndex = startRow; rowIndex <= endRow; rowIndex += 1) {
                 for (let columnIndex = startCol; columnIndex <= endCol; columnIndex += 1) {
-                    hot.setDataAtCell(rowIndex, columnIndex, value)
+                    changes.push([rowIndex, columnIndex, value])
                 }
             }
         }
+
+        hot.setDataAtCell(changes)
       
         hot.render()
         hot.resumeRender()

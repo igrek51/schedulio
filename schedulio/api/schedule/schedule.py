@@ -12,7 +12,7 @@ from schedulio.api.schedule.converters import (
 from schedulio.api.schedule.database import (
     create_or_update_vote, find_guest_by_id, 
     find_schedule_by_id, list_guests_by_schedule, list_votes_by_guest, 
-    list_votes_by_schedule, trim_old_votes, 
+    list_votes_by_schedule, trim_old_votes, trim_old_votes_today, 
     update_guest_last_update,
 )
 from schedulio.api.schedule.time import round_timestamp_to_day, timestamp_to_datetime, today_timestamp
@@ -26,8 +26,7 @@ def get_schedule_schema(schedule_id: str):
 
 
 def get_guest_votes(guest_id: str) -> List[schemas.Vote]:
-    today = today_timestamp()
-    trim_old_votes(today)
+    trim_old_votes_today()
 
     guest_model = find_guest_by_id(guest_id)
     votes = list_votes_by_guest(guest_model)

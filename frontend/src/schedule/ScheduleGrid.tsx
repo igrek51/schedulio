@@ -4,7 +4,8 @@ import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { cellRenderer } from './grid.js';
 import { GridService } from './GridService';
-import { TimeRangeField } from "./TimeRangeField.js";
+import { TimeRangeField } from "./TimeRangeField";
+import { ToastService } from "./ToastService";
 
 registerAllModules();
 
@@ -58,16 +59,50 @@ export class ScheduleGrid extends React.Component<any, any> {
                 const lastRow = hot.countRows() - 1
                 const voteChanges: Array<any> = []
                 changes.forEach(([row, col, oldValue, newValue]) => {
-                    if (row > 0 && row < lastRow && col > 0) {
-                        voteChanges.push([row, col, newValue])
-                    } else if (row === 0 && col > 0) {
-                        GridService.renameGuest(col - 1, newValue)
+                    if (newValue != oldValue) {
+                        if (row > 0 && row < lastRow && col > 0) {
+                            voteChanges.push([row, col, newValue])
+                        } else if (row === 0 && col > 0) {
+                            GridService.renameGuest(col - 1, newValue)
+                            return
+                        }
                     }
                 })
-                if (voteChanges.length > 0) {
-                    GridService.sendVotes(voteChanges)
+                if (voteChanges.length == 0 && changes.length != voteChanges.length) {
+                    return
                 }
+                GridService.sendVotes(voteChanges)
             }
+        }
+
+        function isSelectedHeader(this: Handsontable): boolean {
+            const selectedLast = this.getSelectedLast()
+            if (selectedLast === undefined) {
+                return false
+            }
+            return selectedLast[0] == 0 || selectedLast[1] == 0;
+        }
+
+        function isNotSelectedGuestHeader(this: Handsontable): boolean {
+            const selectedLast = this.getSelectedLast()
+            if (selectedLast === undefined) {
+                return false
+            }
+            return selectedLast[0] > 0 || selectedLast[1] == 0;
+        }
+
+        function deleteSelectedGuest(hot: Handsontable) {
+            const selected = hot.getSelected() || []
+            if (selected.length == 0) {
+                return
+            }
+            if (selected.length > 1) {
+                ToastService.toastError('Please select only one guest')
+                return
+            }
+            const [row1, column1, row2, column2] = selected[0]
+            const guestIndex = column1 - 1
+            GridService.deleteGuest(guestIndex)
         }
 
         const hotSettings: Handsontable.GridSettings = {
@@ -91,28 +126,39 @@ export class ScheduleGrid extends React.Component<any, any> {
             contextMenu: {
                 items: {
                     vote_ok: {
-                        name: 'OK - I\'m available',
+                        name: 'Set "OK" (I\'m available)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('ok')
-                        }
+                        },
+                        hidden: isSelectedHeader,
                     },
                     vote_ok_hours: {
-                        name: 'OK within time range',
+                        name: 'Specify availability time range',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             self.hoursFieldRef.current!.setAvailabilityHours()
-                        }
+                        },
+                        hidden: isSelectedHeader,
                     },
                     vote_maybe: {
-                        name: '(empty) - maybe',
+                        name: 'Set empty (Maybe)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('')
-                        }
+                        },
+                        hidden: isSelectedHeader,
                     },
                     vote_no: {
-                        name: 'No - I can\'t',
+                        name: 'Set "No" (I can\'t)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
                             GridService.setSelectedCells('no')
-                        }
+                        },
+                        hidden: isSelectedHeader,
+                    },
+                    guest_delete: {
+                        name: 'Delete this guest',
+                        callback(this: Handsontable, _key: any, _selection: any, _clickEvent: any) {
+                            deleteSelectedGuest(this)
+                        },
+                        hidden: isNotSelectedGuestHeader,
                     },
                 },
             },
