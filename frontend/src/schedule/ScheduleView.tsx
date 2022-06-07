@@ -55,6 +55,8 @@ function ScheduleView() {
         activateBootstrapTooltips()
     }, []);
 
+    CallbackHell.onTitleLoad = onTitleLoad
+
     const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(menuAnchorEl);
     const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {

@@ -3,6 +3,7 @@ import axios from "axios";
 import { HotTable } from '@handsontable/react';
 import ScheduleGrid from "./ScheduleGrid";
 import { ToastService } from "./ToastService";
+import { CallbackHell } from "./CallbackHell";
 
 
 interface Guest {
@@ -324,6 +325,8 @@ export class GridService {
             options: this.scheduleOptions,
         })
             .then(response => {
+
+                CallbackHell.onTitleLoad(this.title)
                 console.log(`Schedule updated`)
                 ToastService.toastSuccess(`Schedule updated`);
 

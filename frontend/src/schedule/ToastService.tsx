@@ -39,12 +39,16 @@ export class ToastService {
     }
 
     static showAxiosError(context: string, err: any) {
-        if (err.response.hasOwnProperty('data')){
-            const data = err.response.data
-            if (data.hasOwnProperty('error')){
-                const errorDetails = data.error
-                this.toastError(`${context}: ${errorDetails}`);
-                return
+        console.error(`Axios error: ${context}: ${err}`)
+
+        if (err.response !== undefined) {
+            if (err.response.hasOwnProperty('data')){
+                const data = err.response.data
+                if (data.hasOwnProperty('error')){
+                    const errorDetails = data.error
+                    this.toastError(`${context}: ${errorDetails}`);
+                    return
+                }
             }
         }
 
