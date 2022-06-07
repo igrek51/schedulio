@@ -40,10 +40,11 @@ export interface BestMatch {
 }
 
 export class GridService {
+    static scheduleId: string = '';
     static title: string = '...';
+    static scheduleOptions: string = '';
     static guests: Array<Guest> = [];
     static dayVotes: Array<DayVotes> = [];
-    static scheduleId: string = '';
     static guestsById: Record<string, Guest> = {};
     static guestIdToIndex: Record<string, number> = {};
     static hotRef: React.RefObject<HotTable>;
@@ -60,6 +61,7 @@ export class GridService {
         axios.get(`/api/schedule/${this.scheduleId}`)
             .then(response => {
                 this.title = response.data.title;
+                this.scheduleOptions = response.data.options;
                 onTitleLoad(this.title);
 
             }).catch(err => {
@@ -311,6 +313,23 @@ export class GridService {
       
         hot.render()
         hot.resumeRender()
+    }
+
+    static updateSchedule(eventName: string, optionsValue: string) {
+        this.title = eventName
+        this.scheduleOptions = optionsValue
+        axios.put(`/api/schedule/${this.scheduleId}`, {
+            path_id: this.scheduleId,
+            title: this.title,
+            options: this.scheduleOptions,
+        })
+            .then(response => {
+                console.log(`Schedule updated`)
+                ToastService.toastSuccess(`Schedule updated`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Updating schedule`, err)
+            });
     }
 
 };

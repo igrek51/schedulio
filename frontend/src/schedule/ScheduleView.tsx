@@ -24,6 +24,7 @@ import NewGuestView from './NewGuestView';
 import { CallbackHell } from "./CallbackHell";
 import './grid.css';
 import { activateBootstrapTooltips } from './grid.js';
+import EditScheduleView from "./EditScheduleView";
 
 
 function ScheduleView() {
@@ -65,6 +66,7 @@ function ScheduleView() {
 
     const menuEditSchedule = () => {
         handleMenuClose()
+        CallbackHell.editScheduleClickOpen()
     }
 
     const menuDeleteSchedule = () => {
@@ -114,6 +116,8 @@ function ScheduleView() {
                         <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
                         <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
                     </Menu>
+
+                    <EditScheduleView/>
                 </div>
 
                 </Grid>

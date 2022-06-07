@@ -18,6 +18,13 @@ class Schedule(BaseModel):
     options: Union[str, None] = None
 
 
+class ScheduleUpdate(BaseModel):
+    path_id: Union[str, None] = None
+    title: Union[str, None] = None
+    description: Union[str, None] = None
+    options: Union[str, None] = None
+
+
 class GuestCreate(BaseModel):
     name: str
 

@@ -71,7 +71,7 @@ export default function NewGuestView(props: any) {
                         id="inputGuestName"
                         label="Name"
                         fullWidth
-                        variant="standard"
+                        variant="outlined"
                         value={name} onChange={_handleTextFieldChange}
                         onKeyDown={handleKeyDown} 
                     />

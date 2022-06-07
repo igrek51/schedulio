@@ -39,23 +39,26 @@ def create_new_schedule(schedule: schemas.ScheduleCreate) -> models.Schedule:
 
 def update_schedule(
     schedule: models.Schedule,
-    new_schedule: schemas.Schedule,
+    update: schemas.ScheduleUpdate,
 ):
-    assert new_schedule.title, 'Schedule title is required'
-    schedule.title = new_schedule.title
-
-    if new_schedule.path_id is not None:
-        assert new_schedule.path_id, 'Path id cannot be empty'
-        schedule.path_id = new_schedule.path_id
-    if new_schedule.description is not None:
-        schedule.description = new_schedule.description
-    if new_schedule.options is not None:
-        schedule.options = new_schedule.options
+    if update.title is not None:
+        assert update.title, 'Event title cannot be empty'
+        schedule.title = update.title
+    if update.path_id is not None:
+        assert update.path_id, 'Path id cannot be empty'
+        schedule.path_id = update.path_id
+    if update.description is not None:
+        schedule.description = update.description
+    if update.options is not None:
+        schedule.options = update.options
 
     schedule.save()
 
 
 def delete_schedule(schedule: models.Schedule):
+    guests = list_guests_by_schedule(schedule)
+    if guests:
+        raise ValueError(f'Schedule has {len(guests)} guests. Please remove them first.')
     schedule.delete()
     log.info('schedule deleted', id=schedule.id, path_id=schedule.path_id, title=schedule.title)
 
