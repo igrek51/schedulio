@@ -10,6 +10,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import AddIcon from '@mui/icons-material/Add';
 import { GridService } from "./GridService";
 import { ToastService } from "./ToastService";
+import { CallbackHell } from "./CallbackHell";
 
 export default function NewGuestView(props: any) {
 
@@ -47,7 +48,7 @@ export default function NewGuestView(props: any) {
         }
     }
 
-    props.addGuestContainer.handleClickOpen = handleClickOpen
+    CallbackHell.newGuestViewClickOpen = handleClickOpen
 
     return (
         <div>

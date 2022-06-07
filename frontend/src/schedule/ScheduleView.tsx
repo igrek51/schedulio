@@ -21,6 +21,7 @@ import { TimeRangeField } from './TimeRangeField';
 import BestMatchView from './BestMatchView';
 import ScheduleGrid from './ScheduleGrid';
 import NewGuestView from './NewGuestView';
+import { CallbackHell } from "./CallbackHell";
 import './grid.css';
 import { activateBootstrapTooltips } from './grid.js';
 
@@ -70,13 +71,9 @@ function ScheduleView() {
         handleMenuClose()
     }
 
-    const addGuestContainer = {
-        handleClickOpen() {}
-    }
-
     const menuAddGuest = () => {
         handleMenuClose()
-        addGuestContainer.handleClickOpen()
+        CallbackHell.newGuestViewClickOpen()
     }
 
     return (
@@ -151,7 +148,7 @@ function ScheduleView() {
                     </div>
 
                     <div className="d-inline-block ml-2 mt-2">
-                        <NewGuestView addGuestContainer={addGuestContainer} scheduleGridRef={scheduleGridRef}/>
+                        <NewGuestView scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>
 
