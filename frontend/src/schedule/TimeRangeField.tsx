@@ -28,13 +28,13 @@ export class TimeRangeField extends React.Component<any, any> {
     render() {
         return (
             <div className="d-inline-block">
-                <Tooltip title="Specify your availability hours in 'HH-HH' format, 'HH:MM - HH:MM' or 'HH+'" arrow>
+                <Tooltip title="Specify your availability hours in 'HH-HH' format, 'HH:MM - HH:MM' or 'HH+'" arrow placement="top">
                     <TextField className="s-availability-input" label="Availability Hours" variant="outlined" size="small" 
                         value={this.state.hoursValue} onChange={this._handleTextFieldChange.bind(this)}
                         />
                 </Tooltip>
                 <ButtonGroup>
-                    <Tooltip title="Set given availability hours in selected days" arrow>
+                    <Tooltip title="Set given availability hours in selected days" arrow placement="top">
                         <Button variant="contained" color="warning" onClick={this.setAvailabilityHours}>
                             <AccessTimeIcon fontSize="small"/> &nbsp;
                         </Button>

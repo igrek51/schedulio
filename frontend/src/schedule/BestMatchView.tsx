@@ -21,32 +21,39 @@ export class BestMatchView extends React.Component<any, any> {
         ]
     }
 
-    setBestMatch(bestMatch: BestMatch) {
-        let headerRow = ['Day', 'Time', 'Participants']
-        for (const name of bestMatch.guest_names) {
-            headerRow.push(name)
-        }
-
-        let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
-        if (bestMatch.min_guests == bestMatch.max_guests) {
-            var participantsCell = `${bestMatch.min_guests} / ${bestMatch.total_guests}`
+    setBestMatch(bestMatch: BestMatch | null) {
+        if (bestMatch) {
+            let headerRow = ['Day', 'Time', 'Participants']
+            for (const name of bestMatch.guest_names) {
+                headerRow.push(name)
+            }
+    
+            let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
+            if (bestMatch.min_guests == bestMatch.max_guests) {
+                var participantsCell = `${bestMatch.min_guests} / ${bestMatch.total_guests}`
+            } else {
+                var participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
+            }
+            let resultRow = [
+                bestMatch.day_name,
+                timerange,
+                participantsCell,
+            ]
+            for (const vote of bestMatch.guest_votes) {
+                resultRow.push(vote)
+            }
+    
+            this.tableData = [
+                headerRow,
+                resultRow,
+            ]
         } else {
-            var participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
+            this.tableData = [
+                ['Day', 'Time', 'Participants'],
+                ['No day matching your criteria', '', ''],
+            ]
         }
-        let resultRow = [
-            bestMatch.day_name,
-            timerange,
-            participantsCell,
-        ]
-        for (const vote of bestMatch.guest_votes) {
-            resultRow.push(vote)
-        }
-
-        this.tableData = [
-            headerRow,
-            resultRow,
-        ]
-
+    
         let hot = this.hotTableRef.current!.hotInstance!;
         hot.updateData(this.tableData)
     }

@@ -73,6 +73,7 @@ function ScheduleView() {
 
     const menuDeleteSchedule = () => {
         handleMenuClose()
+        GridService.deleteSchedule()
     }
 
     const menuAddGuest = () => {
@@ -114,9 +115,9 @@ function ScheduleView() {
                         open={openMenu}
                         onClose={handleMenuClose}
                         >
+                        <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
                         <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
                         <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
-                        <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
                     </Menu>
 
                     <EditScheduleView/>
@@ -131,17 +132,17 @@ function ScheduleView() {
                 <div className="mb-3">
                     <div className="d-inline-block mx-1 mt-2">
                         <ButtonGroup>
-                            <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow>
+                            <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow placement="top">
                                 <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
                                     <CheckIcon fontSize="small"/> OK
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow>
+                            <Tooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow placement="top">
                                 <Button variant="outlined" onClick={() => { GridService.setSelectedCells('maybe'); }}>
                                     <QuestionMarkIcon fontSize="small"/> Maybe
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="Vote for &quot;No&quot; in selected days" arrow>
+                            <Tooltip title="Vote for &quot;No&quot; in selected days" arrow placement="top">
                                 <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
                                     <CloseIcon fontSize="small"/> No
                                 </Button>
@@ -163,7 +164,7 @@ function ScheduleView() {
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4 data-toggle="tooltip" data-placement="left" title="Best match with the most confirmed participants">
+                    <h4 data-toggle="tooltip" data-placement="left" title="Best match is a day with the most confirmed participants">
                         <StarBorderIcon fontSize="large"/> Best match
                     </h4>
                     <BestMatchView ref={bestMatchRef}/>

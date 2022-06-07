@@ -52,7 +52,7 @@ def setup_endpoints(app: FastAPI):
         return schedule_model_to_schema(schedule_model)
 
     @app.delete("/api/schedule/{schedule_id}")
-    def _delete_schedule(schedule_id: str, new_schedule: schemas.Schedule):
+    def _delete_schedule(schedule_id: str):
         schedule_model = find_schedule_by_path_id(schedule_id)
         delete_schedule(schedule_model)
 

@@ -5,10 +5,10 @@ from collections import defaultdict
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.calendar import days_range, get_day_name
 from schedulio.api.schedule.match import (
-    _parse_time_range,
+    parse_time_range,
     find_match_most_participants,
 )
-from schedulio.api.schedule.options import _parse_schedule_options
+from schedulio.api.schedule.options import parse_schedule_options_json
 from schedulio.djangoapp import models
 from schedulio.api.schedule.converters import (
     guests_model_to_schema, 
@@ -111,7 +111,7 @@ def validate_answer(answer: str):
     if answer in ('ok', 'no', 'maybe', ''):
         return
     try:
-        _parse_time_range(answer)
+        parse_time_range(answer)
     except Exception as e:
         raise ValueError(f'Invalid answer: {e}') from e
 
@@ -123,7 +123,7 @@ def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.
     schedule_model = find_schedule_by_path_id(schedule_id)
     votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
     guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_model))
-    options = _parse_schedule_options(schedule_model.options)
+    options = parse_schedule_options_json(schedule_model.options)
 
     day_guest_vote_map, max_date = group_votes(votes, today)
     max_date = max_date + timedelta(days=1)

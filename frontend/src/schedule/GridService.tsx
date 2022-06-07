@@ -97,7 +97,11 @@ export class GridService {
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
             .then(response => {
                 let bestMatch = response.data
-                this.bestMatchDayName = bestMatch.day_name
+                if (bestMatch === null) {
+                    this.bestMatchDayName = ''
+                } else {
+                    this.bestMatchDayName = bestMatch.day_name
+                }
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()
                 onBestMatchLoad(bestMatch)
@@ -332,6 +336,18 @@ export class GridService {
 
             }).catch(err => {
                 ToastService.showAxiosError(`Updating schedule`, err)
+            });
+    }
+
+    static deleteSchedule() {
+        axios.delete(`/api/schedule/${this.scheduleId}`)
+            .then(response => {
+
+                console.log(`Schedule ${this.scheduleId} deleted`)
+                ToastService.toastSuccess(`Schedule has been deleted`);
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Deleting schedule`, err)
             });
     }
 
