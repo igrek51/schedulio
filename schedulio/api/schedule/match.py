@@ -1,28 +1,31 @@
 from datetime import datetime, time
-import re
 from typing import Callable, Dict, List, Optional
 from pydantic import BaseModel
+
 import pytz
 
 from schedulio.api.schedule import schemas
 from schedulio.api.schedule.calendar import days_range, get_day_name
+from schedulio.api.schedule.options import ScheduleOptions
+from schedulio.api.schedule.time_range import TimeRange, add_time, parse_time_range
 
 
 def find_match_most_participants(
     min_date: datetime, max_date: datetime, 
     guests: List[schemas.Guest],
     day_guest_vote_map: Dict[int, Dict[str, str]],
+    options: ScheduleOptions,
 ) -> Optional[schemas.BestMatch]:
 
     def _match_condition(match: schemas.BestMatch) -> bool:
-        return match.max_guests >= 1
+        return match.max_guests >= options.min_guests
 
     def _match_score(match: schemas.BestMatch) -> float:
         return match.min_guests
 
-    best_match: schemas.BestMatch = _find_best_match(
+    best_match = _find_best_match(
         min_date, max_date, guests, day_guest_vote_map,
-        _match_condition, _match_score, 'most_participants',
+        _match_condition, _match_score, 'most_participants', options,
     )
     return best_match
 
@@ -35,14 +38,6 @@ class TimeMatch(BaseModel):
     guest_votes_ordered: List[str] = []
 
 
-class TimeRange(BaseModel):
-    start_time: time
-    end_time: time
-
-    def is_within(self, t: time) -> bool:
-        return self.start_time <= t <= self.end_time
-
-
 def _find_best_match(
     min_date: datetime,
     max_date: datetime,
@@ -51,17 +46,18 @@ def _find_best_match(
     match_condition: Callable[[schemas.BestMatch], bool],
     match_score: Callable[[schemas.BestMatch], float],
     algorithm: str,
+    options: ScheduleOptions,
 ) -> Optional[schemas.BestMatch]:
     guest_ids = [guest.id for guest in guests]
     guest_names = [guest.name for guest in guests]
 
-    best_match: schemas.BestMatch = None
-    best_score = 0
+    best_match: Optional[schemas.BestMatch] = None
+    best_score: float = 0
 
     for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
 
         guest_votes: Dict[str, str] = day_guest_vote_map.get(day_timestamp, {})
-        time_match = _find_best_time_match(guest_votes, guest_ids)
+        time_match = _find_best_time_match(guest_votes, guest_ids, options)
         start_time = time_match.start_time.strftime("%H:%M")
         end_time = time_match.end_time.strftime("%H:%M")
 
@@ -92,6 +88,7 @@ def _find_best_match(
 def _find_best_time_match(
     guest_votes: Dict[str, str],
     guest_ids: List[str],
+    options: ScheduleOptions,
 ) -> TimeMatch:
     certain_guests = 0
     uncertain_guests = 0
@@ -113,11 +110,11 @@ def _find_best_time_match(
         elif answer == 'no':
             rejected_guests += 1
         else:
-            time_range = _parse_time_range(answer)
+            time_range = parse_time_range(answer)
             conditional_votes.append(time_range)
         guest_votes[guest_id] = answer
 
-    conditional_match = _count_conditional_votes(conditional_votes)
+    conditional_match = _count_conditional_votes(conditional_votes, options)
     min_guests = certain_guests + conditional_match.min_guests
     max_guests = certain_guests + uncertain_guests + conditional_match.max_guests
 
@@ -129,19 +126,18 @@ def _find_best_time_match(
         guest_votes_ordered=[guest_votes[guest_id] for guest_id in guest_ids],
     )
 
+
 def _count_conditional_votes(
     conditional_votes: List[TimeRange],
+    options: ScheduleOptions,
 ) -> TimeMatch:
-    guest_count = 0
-    start_time: time = time(hour=0, minute=0, tzinfo=pytz.UTC)
-    end_time: time = time(hour=23, minute=59, tzinfo=pytz.UTC)
 
     if not conditional_votes:
         return TimeMatch(
-            min_guests=guest_count,
-            max_guests=guest_count,
-            start_time=start_time,
-            end_time=end_time,
+            min_guests=0,
+            max_guests=0,
+            start_time=options.default_start_time,
+            end_time=options.default_end_time,
         )
     
     if len(conditional_votes) == 1:
@@ -155,11 +151,18 @@ def _count_conditional_votes(
             end_time=end_time,
         )
 
+    guest_count = 0
+    start_time = time(hour=0, minute=0, tzinfo=pytz.UTC)
+    end_time = time(hour=23, minute=59, tzinfo=pytz.UTC)
+
     conditional_votes = sorted(conditional_votes, key=lambda x: x.start_time)
     start_time_candidates = [vote.start_time for vote in conditional_votes]
     for start_time_candidate in start_time_candidates:
 
-        matching = [vote for vote in conditional_votes if vote.is_within(start_time_candidate)]
+        end_time_candidate = add_time(start_time_candidate, options.min_duration_delta)
+
+        matching = [vote for vote in conditional_votes if vote.is_within(start_time_candidate) and vote.is_within(end_time_candidate)]
+
         matching_count = len(matching)
         if matching_count > guest_count:
             guest_count = matching_count
@@ -174,55 +177,3 @@ def _count_conditional_votes(
         start_time=start_time,
         end_time=end_time,
     )
-
-
-def _parse_time_range(string: str) -> TimeRange:
-    string = string.strip()
-
-    match = re.fullmatch(r'(\S+) *- *(\S+)', string)
-    if match:
-        start = match.group(1)
-        end = match.group(2)
-        start_time = _parse_time(start)
-        end_time = _parse_time(end)
-        return TimeRange(
-            start_time=start_time,
-            end_time=end_time,
-        )
-
-    match = re.fullmatch(r'(\S+) *(\+)', string)
-    if match:
-        start = match.group(1)
-        start_time = _parse_time(start)
-        return TimeRange(
-            start_time=start_time,
-            end_time=time(hour=23, minute=59, tzinfo=pytz.UTC),
-        )
-
-    raise ValueError(f'Invalid time range format: "{string}"')
-
-
-def _parse_time(stime: str) -> time:
-    match = re.fullmatch(r'(\d{1,2}):(\d{1,2})', stime)
-    if match:
-        hour = int(match.group(1))
-        assert 0 <= hour <= 24, 'hour should be between 0-24'
-        minute = int(match.group(2))
-        assert 0 <= minute <= 59, 'hour should be between 0-59'
-        if hour == 24:
-            assert minute == 0, "can't be more than 24:00"
-            hour = 23
-            minute = 59
-        return time(hour=hour, minute=minute, tzinfo=pytz.UTC)
-
-    match = re.fullmatch(r'(\d{1,2})', stime)
-    if match:
-        hour = int(match.group(1))
-        assert 0 <= hour <= 24, 'hour should be between 0-24'
-        minute = 0
-        if hour == 24:
-            hour = 23
-            minute = 59
-        return time(hour=hour, minute=minute, tzinfo=pytz.UTC)
-
-    raise ValueError(f'Invalid time format: {stime}')

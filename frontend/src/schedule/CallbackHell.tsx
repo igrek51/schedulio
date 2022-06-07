@@ -1,7 +1,3 @@
-import React from "react";
-import { ScheduleTitleView } from "./ScheduleTitleView";
-
-
 export class CallbackHell {
 
     static newGuestViewClickOpen: () => void

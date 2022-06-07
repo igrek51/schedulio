@@ -8,6 +8,7 @@ from schedulio.api.schedule.match import (
     _parse_time_range,
     find_match_most_participants,
 )
+from schedulio.api.schedule.options import _parse_schedule_options
 from schedulio.djangoapp import models
 from schedulio.api.schedule.converters import (
     guests_model_to_schema, 
@@ -122,12 +123,13 @@ def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.
     schedule_model = find_schedule_by_path_id(schedule_id)
     votes: List[models.Vote] = list_votes_by_schedule(schedule_model)
     guests: List[schemas.Guest] = guests_model_to_schema(list_guests_by_schedule(schedule_model))
+    options = _parse_schedule_options(schedule_model.options)
 
     day_guest_vote_map, max_date = group_votes(votes, today)
     max_date = max_date + timedelta(days=1)
     min_date = timestamp_to_datetime(today)
 
-    return find_match_most_participants(min_date, max_date, guests, day_guest_vote_map)
+    return find_match_most_participants(min_date, max_date, guests, day_guest_vote_map, options)
 
 
 def group_votes(votes: List[models.Vote], today: int) -> Tuple[Dict[int, Dict[str, str]], datetime]:
