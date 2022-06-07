@@ -10,7 +10,7 @@ import { ScheduleService } from "./ScheduleService";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
 
-export default function EditScheduleView(props: any) {
+export default function EditScheduleDialog(props: any) {
 
     const [open, setOpen] = React.useState(false);
     const [eventName, setEventName] = React.useState('');
@@ -29,7 +29,7 @@ export default function EditScheduleView(props: any) {
 
     const confirmSaving = () => {
         if (eventName.length === 0) {
-            ToastService.toastError('Name was not given')
+            ToastService.toastError('Event Name is required')
         } else {
             ScheduleService.updateSchedule(eventName, optionsValue)
         }

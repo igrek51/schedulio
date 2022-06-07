@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { ToastContainer } from 'react-toastify';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
@@ -24,11 +23,10 @@ import NewGuestView from './NewGuestView';
 import { CallbackHell } from "./CallbackHell";
 import './grid.css';
 import { activateBootstrapTooltips } from './grid.js';
-import EditScheduleView from "./EditScheduleView";
+import EditScheduleDialog from "./EditScheduleDialog";
 
 
 function ScheduleView() {
-    console.log('rendering ScheduleView...');
 
     const titleRef = React.createRef<EventTitleView>();
     const scheduleGridRef = React.createRef<GridComponent>();
@@ -71,9 +69,14 @@ function ScheduleView() {
         CallbackHell.editScheduleClickOpen()
     }
 
+    const navigate = useNavigate();
+    const goToHomePage = () => {
+        navigate(`/`)
+    }
+
     const menuDeleteSchedule = () => {
         handleMenuClose()
-        ScheduleService.deleteSchedule()
+        ScheduleService.deleteSchedule(goToHomePage)
     }
 
     const menuAddGuest = () => {
@@ -81,9 +84,13 @@ function ScheduleView() {
         CallbackHell.newGuestViewClickOpen()
     }
 
+    const menuCreateSchedule = () => {
+        handleMenuClose()
+        goToHomePage()
+    }
+
     return (
         <div className="mt-3">
-            <ToastContainer />
             <Container maxWidth="lg" disableGutters>
 
                 <Grid
@@ -117,10 +124,11 @@ function ScheduleView() {
                         >
                         <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
                         <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
+                        <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
                         <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
                     </Menu>
 
-                    <EditScheduleView/>
+                    <EditScheduleDialog/>
                 </div>
 
                 </Grid>

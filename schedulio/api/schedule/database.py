@@ -1,9 +1,11 @@
 from typing import List, Optional
 
 from nuclear.sublog import log
+from nuclear import wrap_context
 
 from schedulio.api.errors import EntityNotFound
 from schedulio.api.schedule import schemas
+from schedulio.api.schedule.options import parse_schedule_options_json
 from schedulio.djangoapp import models
 from schedulio.api.schedule.time import local_today_timestamp, now_timestamp
 
@@ -27,12 +29,16 @@ def create_new_schedule(schedule: schemas.ScheduleCreate) -> models.Schedule:
     if schedule.path_id is not None:
         assert schedule.path_id, 'Path id cannot be empty'
 
+    with wrap_context('validating schedule options'):
+        parse_schedule_options_json(schedule.options)
+
     new_model = models.Schedule(
         title=schedule.title,
         description=schedule.description,
-        path_id=schedule.path_id,
         options=schedule.options,
     )
+    if schedule.path_id is not None:
+        new_model.path_id = schedule.path_id
     new_model.save()
     return new_model
 
@@ -50,6 +56,8 @@ def update_schedule(
     if update.description is not None:
         schedule.description = update.description
     if update.options is not None:
+        with wrap_context('validating schedule options'):
+            parse_schedule_options_json(update.options)
         schedule.options = update.options
 
     schedule.save()

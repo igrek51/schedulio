@@ -339,15 +339,32 @@ export class ScheduleService {
             });
     }
 
-    static deleteSchedule() {
+    static deleteSchedule(onSuccess: () => void) {
         axios.delete(`/api/schedule/${this.scheduleId}`)
             .then(response => {
 
                 console.log(`Schedule ${this.scheduleId} deleted`)
                 ToastService.toastSuccess(`Schedule has been deleted`);
+                onSuccess()
 
             }).catch(err => {
                 ToastService.showAxiosError(`Deleting schedule`, err)
+            });
+    }
+
+    static createSchedule(eventName: string, optionsValue: string, onSuccessfulCreate: (pathId: string) => void) {
+        axios.post(`/api/schedule`, {
+            title: eventName,
+            options: optionsValue,
+        })
+            .then(response => {
+
+                console.log(`Schedule ${response.data.id} - ${response.data.path_id} created`)
+                ToastService.toastSuccess(`Schedule has been created`);
+                onSuccessfulCreate(response.data.path_id)
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Creating schedule`, err)
             });
     }
 
