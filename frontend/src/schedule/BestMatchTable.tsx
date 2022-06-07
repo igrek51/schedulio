@@ -2,13 +2,13 @@ import React from "react";
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
-import { BestMatch } from './GridService';
+import { BestMatch } from './ScheduleService';
 import { bestmatchCellRenderer } from "./grid.js";
 
 registerAllModules();
 
 
-export class BestMatchView extends React.Component<any, any> {
+export class BestMatchTable extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
     tableData: string[][];
@@ -98,4 +98,4 @@ export class BestMatchView extends React.Component<any, any> {
     }
 }
 
-export default BestMatchView;
+export default BestMatchTable;

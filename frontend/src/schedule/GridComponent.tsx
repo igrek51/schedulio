@@ -3,14 +3,14 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { cellRenderer, activateBootstrapTooltips } from './grid.js';
-import { GridService } from './GridService';
+import { ScheduleService } from './ScheduleService';
 import { TimeRangeField } from "./TimeRangeField";
 import { ToastService } from "./ToastService";
 
 registerAllModules();
 
 
-export class ScheduleGrid extends React.Component<any, any> {
+export class GridComponent extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
     hoursFieldRef: React.RefObject<TimeRangeField>;
@@ -61,7 +61,7 @@ export class ScheduleGrid extends React.Component<any, any> {
         function afterSelection(hot: any, row: number, column: number, row2: number, column2: number, preventScrolling: any, selectionLayerLevel: any) {
             const lastRow = hot.countRows() - 1
             if (row === lastRow || row2 === lastRow) {
-                GridService.loadMoreVotes()
+                ScheduleService.loadMoreVotes()
             }
         }
 
@@ -74,7 +74,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                         if (row > 0 && row < lastRow && col > 0) {
                             voteChanges.push([row, col, newValue])
                         } else if (row === 0 && col > 0) {
-                            GridService.renameGuest(col - 1, newValue)
+                            ScheduleService.renameGuest(col - 1, newValue)
                             return
                         }
                     }
@@ -82,7 +82,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                 if (voteChanges.length === 0 && changes.length !== voteChanges.length) {
                     return
                 }
-                GridService.sendVotes(voteChanges)
+                ScheduleService.sendVotes(voteChanges)
             }
         }
 
@@ -113,7 +113,7 @@ export class ScheduleGrid extends React.Component<any, any> {
             }
             const [_row1, column1, _row2, _column2] = selected[0]
             const guestIndex = column1 - 1
-            GridService.deleteGuest(guestIndex)
+            ScheduleService.deleteGuest(guestIndex)
         }
 
         const hotSettings: Handsontable.GridSettings = {
@@ -139,7 +139,7 @@ export class ScheduleGrid extends React.Component<any, any> {
                     vote_ok: {
                         name: 'OK (I\'m available)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
-                            GridService.setSelectedCells('ok')
+                            ScheduleService.setSelectedCells('ok')
                         },
                         hidden: isSelectedHeader,
                     },
@@ -153,21 +153,21 @@ export class ScheduleGrid extends React.Component<any, any> {
                     vote_maybe: {
                         name: 'Maybe',
                         callback(_key: any, _selection: any, _clickEvent: any) {
-                            GridService.setSelectedCells('maybe')
+                            ScheduleService.setSelectedCells('maybe')
                         },
                         hidden: isSelectedHeader,
                     },
                     vote_no: {
                         name: 'No (I can\'t)',
                         callback(_key: any, _selection: any, _clickEvent: any) {
-                            GridService.setSelectedCells('no')
+                            ScheduleService.setSelectedCells('no')
                         },
                         hidden: isSelectedHeader,
                     },
                     vote_clear: {
                         name: 'Clear',
                         callback(_key: any, _selection: any, _clickEvent: any) {
-                            GridService.setSelectedCells('')
+                            ScheduleService.setSelectedCells('')
                         },
                         hidden: isSelectedHeader,
                     },
@@ -210,4 +210,4 @@ export class ScheduleGrid extends React.Component<any, any> {
     }
 }
 
-export default ScheduleGrid;
+export default GridComponent;

@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { HotTable } from '@handsontable/react';
-import ScheduleGrid from "./ScheduleGrid";
+import GridComponent from "./GridComponent";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
 
@@ -40,7 +40,7 @@ export interface BestMatch {
     place: number | null;
 }
 
-export class GridService {
+export class ScheduleService {
     static scheduleId: string = '';
     static title: string = '...';
     static scheduleOptions: string = '';
@@ -49,7 +49,7 @@ export class GridService {
     static guestsById: Record<string, Guest> = {};
     static guestIdToIndex: Record<string, number> = {};
     static hotRef: React.RefObject<HotTable>;
-    static scheduleGridRef: React.RefObject<ScheduleGrid>;
+    static scheduleGridRef: React.RefObject<GridComponent>;
     static timestampToDayOfWeek: Record<string, number> = {};
     static bestMatchDayName: string = '';
 

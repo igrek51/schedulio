@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { GridService } from "./GridService";
+import { ScheduleService } from "./ScheduleService";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
 
@@ -19,8 +19,8 @@ export default function EditScheduleView(props: any) {
 
     const handleClickOpen = () => {
         setOpen(true);
-        setEventName(GridService.title);
-        setOptionsValue(GridService.scheduleOptions);
+        setEventName(ScheduleService.title);
+        setOptionsValue(ScheduleService.scheduleOptions);
     };
 
     const handleClose = () => {
@@ -31,7 +31,7 @@ export default function EditScheduleView(props: any) {
         if (eventName.length === 0) {
             ToastService.toastError('Name was not given')
         } else {
-            GridService.updateSchedule(eventName, optionsValue)
+            ScheduleService.updateSchedule(eventName, optionsValue)
         }
         handleClose()
     };

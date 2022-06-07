@@ -3,7 +3,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import React from "react";
-import {GridService} from './GridService';
+import {ScheduleService} from './ScheduleService';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export class TimeRangeField extends React.Component<any, any> {
@@ -22,7 +22,7 @@ export class TimeRangeField extends React.Component<any, any> {
 
     setAvailabilityHours() {
         const value = this.state.hoursValue
-        GridService.voteOkHours(value);
+        ScheduleService.voteOkHours(value);
     }
 
     render() {

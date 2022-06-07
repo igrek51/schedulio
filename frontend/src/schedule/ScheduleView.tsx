@@ -15,11 +15,11 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
 
-import { BestMatch, GridService } from './GridService';
-import {ScheduleTitleView} from './ScheduleTitleView';
+import { BestMatch, ScheduleService } from './ScheduleService';
+import {EventTitleView} from './EventTitleView';
 import { TimeRangeField } from './TimeRangeField';
-import BestMatchView from './BestMatchView';
-import ScheduleGrid from './ScheduleGrid';
+import BestMatchTable from './BestMatchTable';
+import GridComponent from './GridComponent';
 import NewGuestView from './NewGuestView';
 import { CallbackHell } from "./CallbackHell";
 import './grid.css';
@@ -30,13 +30,13 @@ import EditScheduleView from "./EditScheduleView";
 function ScheduleView() {
     console.log('rendering ScheduleView...');
 
-    const titleRef = React.createRef<ScheduleTitleView>();
-    const scheduleGridRef = React.createRef<ScheduleGrid>();
+    const titleRef = React.createRef<EventTitleView>();
+    const scheduleGridRef = React.createRef<GridComponent>();
     const hoursFieldRef = React.createRef<TimeRangeField>();
-    const bestMatchRef = React.createRef<BestMatchView>();
+    const bestMatchRef = React.createRef<BestMatchTable>();
     
     const { scheduleId } = useParams();
-    GridService.scheduleId = scheduleId!;
+    ScheduleService.scheduleId = scheduleId!;
 
     const onTitleLoad = (title: string) => {
         titleRef.current!.setState({title: title});
@@ -47,10 +47,10 @@ function ScheduleView() {
     }
 
     useEffect(() => {
-        GridService.scheduleGridRef = scheduleGridRef;
-        GridService.hotRef = scheduleGridRef.current!.hotTableRef;
+        ScheduleService.scheduleGridRef = scheduleGridRef;
+        ScheduleService.hotRef = scheduleGridRef.current!.hotTableRef;
 
-        GridService.fetchData(onTitleLoad, onBestMatchLoad);
+        ScheduleService.fetchData(onTitleLoad, onBestMatchLoad);
 
         activateBootstrapTooltips()
     }, []);
@@ -73,7 +73,7 @@ function ScheduleView() {
 
     const menuDeleteSchedule = () => {
         handleMenuClose()
-        GridService.deleteSchedule()
+        ScheduleService.deleteSchedule()
     }
 
     const menuAddGuest = () => {
@@ -93,7 +93,7 @@ function ScheduleView() {
                     alignItems="center"
                     >
 
-                <ScheduleTitleView ref={titleRef}/>
+                <EventTitleView ref={titleRef}/>
 
                 <div className="d-inline-block ml-2 mt-2">
                     <IconButton
@@ -133,17 +133,17 @@ function ScheduleView() {
                     <div className="d-inline-block mx-1 mt-2">
                         <ButtonGroup>
                             <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow placement="top">
-                                <Button variant="contained" color="success" onClick={() => { GridService.setSelectedCells('ok'); }}>
+                                <Button variant="contained" color="success" onClick={() => { ScheduleService.setSelectedCells('ok'); }}>
                                     <CheckIcon fontSize="small"/> OK
                                 </Button>
                             </Tooltip>
                             <Tooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow placement="top">
-                                <Button variant="outlined" onClick={() => { GridService.setSelectedCells('maybe'); }}>
+                                <Button variant="outlined" onClick={() => { ScheduleService.setSelectedCells('maybe'); }}>
                                     <QuestionMarkIcon fontSize="small"/> Maybe
                                 </Button>
                             </Tooltip>
                             <Tooltip title="Vote for &quot;No&quot; in selected days" arrow placement="top">
-                                <Button variant="contained" color="error" onClick={() => { GridService.setSelectedCells('no'); }}>
+                                <Button variant="contained" color="error" onClick={() => { ScheduleService.setSelectedCells('no'); }}>
                                     <CloseIcon fontSize="small"/> No
                                 </Button>
                             </Tooltip>
@@ -160,14 +160,14 @@ function ScheduleView() {
                 </div>
 
                 <div className="grid-container">
-                    <ScheduleGrid ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
+                    <GridComponent ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
                 </div>
 
                 <div className="mt-4 mb-5">
                     <h4 data-toggle="tooltip" data-placement="left" title="Best match is a day with the most confirmed participants">
                         <StarBorderIcon fontSize="large"/> Best match
                     </h4>
-                    <BestMatchView ref={bestMatchRef}/>
+                    <BestMatchTable ref={bestMatchRef}/>
                 </div>
 
             </Container>

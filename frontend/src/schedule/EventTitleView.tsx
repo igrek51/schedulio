@@ -1,6 +1,6 @@
 import React from "react";
 
-export class ScheduleTitleView extends React.Component<any, any> {
+export class EventTitleView extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {title: '...'};

@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import AddIcon from '@mui/icons-material/Add';
-import { GridService } from "./GridService";
+import { ScheduleService } from "./ScheduleService";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
 
@@ -33,7 +33,7 @@ export default function NewGuestView(props: any) {
         if (name.length === 0) {
             ToastService.toastError('Name was not given');
         } else {
-            GridService.addNewGuest(name);
+            ScheduleService.addNewGuest(name);
         }
         handleClose();
     };
