@@ -6,6 +6,7 @@ import { cellRenderer, activateBootstrapTooltips } from './grid.js';
 import { ScheduleService } from './ScheduleService';
 import { TimeRangeField } from "./TimeRangeField";
 import { ToastService } from "./ToastService";
+import { CallbackHell } from "./CallbackHell";
 
 registerAllModules();
 
@@ -61,7 +62,7 @@ export class GridComponent extends React.Component<any, any> {
         function afterSelection(hot: any, row: number, column: number, row2: number, column2: number, preventScrolling: any, selectionLayerLevel: any) {
             const lastRow = hot.countRows() - 1
             if (row === lastRow || row2 === lastRow) {
-                ScheduleService.loadMoreVotes()
+                ScheduleService.loadMoreDays()
             }
         }
 
@@ -92,6 +93,14 @@ export class GridComponent extends React.Component<any, any> {
                 return false
             }
             return selectedLast[0] === 0 || selectedLast[1] === 0;
+        }
+
+        function isNotSelectedHeaderRow(this: Handsontable): boolean {
+            const selectedLast = this.getSelectedLast()
+            if (selectedLast === undefined) {
+                return false
+            }
+            return selectedLast[0] > 0;
         }
 
         function isNotSelectedGuestHeader(this: Handsontable): boolean {
@@ -170,6 +179,13 @@ export class GridComponent extends React.Component<any, any> {
                             ScheduleService.setSelectedCells('')
                         },
                         hidden: isSelectedHeader,
+                    },
+                    guest_add: {
+                        name: 'Add new guest',
+                        callback(this: Handsontable, _key: any, _selection: any, _clickEvent: any) {
+                            CallbackHell.newGuestViewClickOpen()
+                        },
+                        hidden: isNotSelectedHeaderRow,
                     },
                     guest_delete: {
                         name: 'Delete this guest',

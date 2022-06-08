@@ -99,45 +99,47 @@ function ScheduleView() {
                     justifyContent="space-between"
                     alignItems="center"
                     >
+                    <EventTitleView ref={titleRef}/>
 
-                <EventTitleView ref={titleRef}/>
+                    <div className="d-inline-block ml-2 mt-2">
+                        <IconButton
+                            aria-label="more"
+                            id="basic-menu-button"
+                            aria-controls={openMenu ? 'basic-menu' : undefined}
+                            aria-expanded={openMenu ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleMenuClick}
+                            >
+                            <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                            id="basic-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-menu-button',
+                            }}
+                            anchorEl={menuAnchorEl}
+                            open={openMenu}
+                            onClose={handleMenuClose}
+                            >
+                            <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
+                            <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
+                            <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
+                            <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
+                        </Menu>
 
-                <div className="d-inline-block ml-2 mt-2">
-                    <IconButton
-                        aria-label="more"
-                        id="basic-menu-button"
-                        aria-controls={openMenu ? 'basic-menu' : undefined}
-                        aria-expanded={openMenu ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handleMenuClick}
-                        >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                        id="basic-menu"
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-menu-button',
-                        }}
-                        anchorEl={menuAnchorEl}
-                        open={openMenu}
-                        onClose={handleMenuClose}
-                        >
-                        <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
-                        <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
-                        <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
-                        <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
-                    </Menu>
-
-                    <EditScheduleDialog/>
-                </div>
-
+                        <EditScheduleDialog/>
+                    </div>
                 </Grid>
 
                 <div className="ml-1">
                     Select cells and mark your availability.
                 </div>
 
-                <div className="mb-3">
+                <div className="mb-2">
+                    <div className="d-inline-block ml-1 mr-2 mt-2">
+                        <NewGuestView scheduleGridRef={scheduleGridRef}/>
+                    </div>
+
                     <div className="d-inline-block mx-1 mt-2">
                         <ButtonGroup>
                             <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow placement="top">
@@ -158,12 +160,8 @@ function ScheduleView() {
                         </ButtonGroup>
                     </div>
 
-                    <div className="d-inline-block mx-1 mt-3">
+                    <div className="d-inline-block ml-1 mt-2">
                         <TimeRangeField ref={hoursFieldRef}/>
-                    </div>
-
-                    <div className="d-inline-block ml-2 mt-2">
-                        <NewGuestView scheduleGridRef={scheduleGridRef}/>
                     </div>
                 </div>
 

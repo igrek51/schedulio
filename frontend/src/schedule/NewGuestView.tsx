@@ -8,6 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import AddIcon from '@mui/icons-material/Add';
+import Tooltip from '@mui/material/Tooltip';
 import { ScheduleService } from "./ScheduleService";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
@@ -42,8 +43,8 @@ export default function NewGuestView(props: any) {
         setName(e.target.value);
     };
 
-    const handleKeyDown = (e: any) => {
-        if (e.key === 'Enter') {
+    const handleKeyUp = (e: any) => {
+        if (e.key === 'Enter' && open) {
             confirmAdding();
         }
     }
@@ -53,9 +54,11 @@ export default function NewGuestView(props: any) {
     return (
         <div>
             <ButtonGroup>
-                <Button variant="contained" color="primary" onClick={handleClickOpen}>
-                    <AddIcon fontSize="small" /> Add Guest
-                </Button>
+                <Tooltip title="Add yourself to the table" arrow placement="top">
+                    <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                        <AddIcon fontSize="small" /> Add Guest
+                    </Button>
+                </Tooltip>
             </ButtonGroup>
 
             <Dialog open={open} onClose={handleClose}>
@@ -73,12 +76,12 @@ export default function NewGuestView(props: any) {
                         fullWidth
                         variant="outlined"
                         value={name} onChange={_handleTextFieldChange}
-                        onKeyDown={handleKeyDown} 
+                        onKeyUp={handleKeyUp}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={confirmAdding} type="submit">Add</Button>
+                    <Button onClick={confirmAdding}>Add</Button>
                 </DialogActions>
             </Dialog>
         </div>

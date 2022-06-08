@@ -143,7 +143,7 @@ export class ScheduleService {
         hot.resumeRender()
     }
 
-    static loadMoreVotes() {
+    static loadMoreDays() {
         let lastDay = 0
         if (this.dayVotes.length > 0) {
             lastDay = this.dayVotes[this.dayVotes.length - 1].day_timestamp

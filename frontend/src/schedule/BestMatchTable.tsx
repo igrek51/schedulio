@@ -50,7 +50,7 @@ export class BestMatchTable extends React.Component<any, any> {
         } else {
             this.tableData = [
                 ['Day', 'Time', 'Participants'],
-                ['Can\'t find any day matching your criteria', '', ''],
+                ['Can\'t find any day matching your criteria (insufficient participants)', '', ''],
             ]
         }
     
