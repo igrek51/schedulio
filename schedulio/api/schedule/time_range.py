@@ -13,6 +13,12 @@ class TimeRange(BaseModel):
     def is_within(self, t: time) -> bool:
         return self.start_time <= t <= self.end_time
 
+    @property
+    def duration(self) -> int:
+        hours = (self.end_time.hour - self.start_time.hour)
+        minutes = (self.end_time.minute - self.start_time.minute)
+        return hours * 60 + minutes
+
 
 def parse_time_range(string: str) -> TimeRange:
     string = string.strip()

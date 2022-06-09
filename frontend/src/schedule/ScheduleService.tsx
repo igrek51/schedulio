@@ -26,6 +26,15 @@ interface Vote {
     answer: string;
 }
 
+interface Schedule {
+    id: string
+    path_id: string
+    title: string
+    description: string | null
+    create_time: number
+    options: string | null
+}
+
 export interface BestMatch {
     day_timestamp: number;
     day_name: string;
@@ -35,7 +44,8 @@ export interface BestMatch {
     max_guests: number;
     total_guests: number;
     guest_votes: string[];
-    guest_names: string[];
+    all_guest_names: string[];
+    guest_results: string[];
     algorithm: string;
     place: number | null;
 }
@@ -43,7 +53,7 @@ export interface BestMatch {
 export class ScheduleService {
     static scheduleId: string = '';
     static title: string = '...';
-    static scheduleOptions: string = '';
+    static scheduleOptions: string | null = '';
     static guests: Array<Guest> = [];
     static dayVotes: Array<DayVotes> = [];
     static guestsById: Record<string, Guest> = {};
@@ -52,6 +62,7 @@ export class ScheduleService {
     static scheduleGridRef: React.RefObject<GridComponent>;
     static timestampToDayOfWeek: Record<string, number> = {};
     static bestMatchDayName: string = '';
+    static guestResults: string[] = [];
 
     static fetchData(
         onTitleLoad: (title: string) => void,
@@ -61,8 +72,9 @@ export class ScheduleService {
 
         axios.get(`/api/schedule/${this.scheduleId}`)
             .then(response => {
-                this.title = response.data.title;
-                this.scheduleOptions = response.data.options;
+                const schedule: Schedule = response.data;
+                this.title = schedule.title;
+                this.scheduleOptions = schedule.options;
                 onTitleLoad(this.title);
 
             }).catch(err => {
@@ -71,7 +83,7 @@ export class ScheduleService {
 
         axios.get(`/api/schedule/${this.scheduleId}/guest`)
             .then(response => {
-                let guests = response.data
+                const guests: Guest[] = response.data
                 const self: any = this;
                 guests.forEach(function (guest: Guest, i: number) {
                     self.guestsById[guest.id] = guest
@@ -86,7 +98,7 @@ export class ScheduleService {
 
         axios.get(`/api/schedule/${this.scheduleId}/votes`)
             .then(response => {
-                let dayVotes = response.data.day_votes
+                const dayVotes: DayVotes[] = response.data.day_votes
                 this.dayVotes = dayVotes
                 this.refreshAllVotes()
 
@@ -96,11 +108,13 @@ export class ScheduleService {
 
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
             .then(response => {
-                let bestMatch = response.data
+                const bestMatch: BestMatch = response.data
                 if (bestMatch === null) {
                     this.bestMatchDayName = ''
+                    this.guestResults = []
                 } else {
                     this.bestMatchDayName = bestMatch.day_name
+                    this.guestResults = bestMatch.guest_results
                 }
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()

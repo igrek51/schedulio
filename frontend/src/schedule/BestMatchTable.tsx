@@ -24,7 +24,7 @@ export class BestMatchTable extends React.Component<any, any> {
     setBestMatch(bestMatch: BestMatch | null) {
         if (bestMatch) {
             let headerRow = ['Day', 'Time', 'Participants']
-            for (const name of bestMatch.guest_names) {
+            for (const name of bestMatch.all_guest_names) {
                 headerRow.push(name)
             }
     

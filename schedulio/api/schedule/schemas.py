@@ -66,6 +66,7 @@ class BestMatch(BaseModel):
     max_guests: int  # potential participants
     total_guests: int
     guest_votes: List[str]
-    guest_names: List[str]
+    all_guest_names: List[str]
+    guest_results: List[str]
     algorithm: str
     place: Optional[int]

@@ -20,7 +20,7 @@ export default function EditScheduleDialog(props: any) {
     const handleClickOpen = () => {
         setOpen(true);
         setEventName(ScheduleService.title);
-        setOptionsValue(ScheduleService.scheduleOptions);
+        setOptionsValue(ScheduleService.scheduleOptions || '');
     };
 
     const handleClose = () => {

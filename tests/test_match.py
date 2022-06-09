@@ -67,7 +67,8 @@ def test_best_match_most_participants():
     assert best_match.max_guests == 3
     assert best_match.total_guests == 3
     assert best_match.guest_votes == ['ok', '19-20', '18 - 22']
-    assert best_match.guest_names == ['Alice', 'Bob', 'Charlie']
+    assert best_match.all_guest_names == ['Alice', 'Bob', 'Charlie']
+    assert best_match.guest_results == ['ok', 'ok', 'ok']
 
 
 def test_best_match_is_empty_day():
@@ -104,7 +105,8 @@ def test_best_match_is_empty_day():
     assert best_match.max_guests == 2
     assert best_match.total_guests == 2
     assert best_match.guest_votes == ['', '']
-    assert best_match.guest_names == ['Alice', 'Bob']
+    assert best_match.all_guest_names == ['Alice', 'Bob']
+    assert best_match.guest_results == ['maybe', 'maybe']
 
 
 def test_no_match_because_insufficient_guests():
@@ -116,7 +118,6 @@ def test_no_match_because_insufficient_guests():
         schemas.Guest(id='1', name='Alice', schedule_id='1', create_time=0, last_update=0),
         schemas.Guest(id='2', name='Bob', schedule_id='1', create_time=0, last_update=0),
     ]
-    a_day = 24*3600
     day_guest_vote_map: Dict[int, Dict[str, str]] = {
         today_timestamp: {
             '1': 'ok',

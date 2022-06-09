@@ -30,12 +30,18 @@ def find_match_most_participants(
     return best_match
 
 
+class ConditionalVote(BaseModel):
+    guest_id: str
+    time_range: TimeRange
+
+
 class TimeMatch(BaseModel):
     min_guests: int  # confirmed participants
     max_guests: int  # potential participants
     start_time: time
     end_time: time
     guest_votes_ordered: List[str] = []
+    guest_results_map: Dict[str, str] = {}  # guest id -> final result
 
 
 def _find_best_match(
@@ -49,7 +55,7 @@ def _find_best_match(
     options: ScheduleOptions,
 ) -> Optional[schemas.BestMatch]:
     guest_ids = [guest.id for guest in guests]
-    guest_names = [guest.name for guest in guests]
+    all_guest_names = [guest.name for guest in guests]
 
     best_match: Optional[schemas.BestMatch] = None
     best_score: float = 0
@@ -60,6 +66,7 @@ def _find_best_match(
         time_match = _find_best_time_match(guest_votes, guest_ids, options)
         start_time = time_match.start_time.strftime("%H:%M")
         end_time = time_match.end_time.strftime("%H:%M")
+        guest_results = [time_match.guest_results_map.get(guest_id) for guest_id in guest_ids]
 
         match = schemas.BestMatch(
             day_timestamp=day_timestamp,
@@ -73,7 +80,8 @@ def _find_best_match(
             algorithm=algorithm,
             place=1,
             guest_votes=time_match.guest_votes_ordered,
-            guest_names=guest_names,
+            all_guest_names=all_guest_names,
+            guest_results=guest_results,
         )
 
         if match_condition(match):
@@ -93,8 +101,8 @@ def _find_best_time_match(
     certain_guests = 0
     uncertain_guests = 0
     rejected_guests = 0
-
-    conditional_votes: List[TimeRange] = []
+    conditional_votes: List[ConditionalVote] = []
+    guest_results_map: Dict[str, str] = {}
 
     for guest_id in guest_ids:
         answer = guest_votes.get(guest_id)
@@ -103,20 +111,27 @@ def _find_best_time_match(
             
         if answer == '':
             uncertain_guests += 1
+            guest_results_map[guest_id] = 'maybe'
         elif answer == 'maybe':
             uncertain_guests += 1
+            guest_results_map[guest_id] = 'maybe'
         elif answer == 'ok':
             certain_guests += 1
+            guest_results_map[guest_id] = 'ok'
         elif answer == 'no':
             rejected_guests += 1
+            guest_results_map[guest_id] = 'no'
         else:
             time_range = parse_time_range(answer)
-            conditional_votes.append(time_range)
+            condition_vote = ConditionalVote(guest_id=guest_id, time_range=time_range)
+            conditional_votes.append(condition_vote)
+
         guest_votes[guest_id] = answer
 
-    conditional_match = _count_conditional_votes(conditional_votes, options)
+    conditional_match: TimeMatch = _count_conditional_votes(conditional_votes, options)
     min_guests = certain_guests + conditional_match.min_guests
     max_guests = certain_guests + uncertain_guests + conditional_match.max_guests
+    guest_results_map.update(conditional_match.guest_results_map)
 
     return TimeMatch(
         min_guests=min_guests,
@@ -124,11 +139,12 @@ def _find_best_time_match(
         start_time=conditional_match.start_time,
         end_time=conditional_match.end_time,
         guest_votes_ordered=[guest_votes[guest_id] for guest_id in guest_ids],
+        guest_results_map=guest_results_map,
     )
 
 
 def _count_conditional_votes(
-    conditional_votes: List[TimeRange],
+    conditional_votes: List[ConditionalVote],
     options: ScheduleOptions,
 ) -> TimeMatch:
 
@@ -141,39 +157,52 @@ def _count_conditional_votes(
         )
     
     if len(conditional_votes) == 1:
-        start_time = conditional_votes[0].start_time
-        end_time = conditional_votes[0].end_time
+        vote = conditional_votes[0]
+        start_time = vote.time_range.start_time
+        end_time = vote.time_range.end_time
         guest_count = len(conditional_votes)
         return TimeMatch(
             min_guests=guest_count,
             max_guests=guest_count,
             start_time=start_time,
             end_time=end_time,
+            guest_results_map={vote.guest_id: 'ok'},
         )
 
     guest_count = 0
     start_time = time(hour=0, minute=0, tzinfo=pytz.UTC)
     end_time = time(hour=23, minute=59, tzinfo=pytz.UTC)
+    guest_results_map: Dict[str, str] = {}
+    best_matching_votes: List[ConditionalVote] = []
 
-    conditional_votes = sorted(conditional_votes, key=lambda x: x.start_time)
-    start_time_candidates = [vote_range.start_time for vote_range in conditional_votes]
+    conditional_votes = sorted(conditional_votes, key=lambda v: v.time_range.duration)
+    start_time_candidates = [vote.time_range.start_time for vote in conditional_votes]
     for start_time_candidate in start_time_candidates:
 
         end_time_candidate = add_time(start_time_candidate, options.min_duration_delta)
 
-        matching = [vote for vote in conditional_votes if vote.is_within(start_time_candidate) and vote.is_within(end_time_candidate)]
+        matching_votes = [vote for vote in conditional_votes
+                          if vote.time_range.is_within(start_time_candidate)
+                          and vote.time_range.is_within(end_time_candidate)]
 
-        matching_count = len(matching)
-        if matching_count > guest_count:
-            guest_count = matching_count
+        if len(matching_votes) > guest_count:
+            guest_count = len(matching_votes)
+            best_matching_votes = matching_votes
             start_time = start_time_candidate
 
-            end_times = [vote.end_time for vote in matching]
+            end_times = [vote.time_range.end_time for vote in matching_votes]
             end_time = min(end_times)
+
+    for vote in conditional_votes:
+        if vote in best_matching_votes:
+            guest_results_map[vote.guest_id] = 'ok'
+        else:
+            guest_results_map[vote.guest_id] = 'no'
 
     return TimeMatch(
         min_guests=guest_count,
         max_guests=guest_count,
         start_time=start_time,
         end_time=end_time,
+        guest_results_map=guest_results_map,
     )
