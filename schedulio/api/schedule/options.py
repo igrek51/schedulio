@@ -41,7 +41,7 @@ def _parse_schedule_options(options: ScheduleOptionsJson) -> ScheduleOptions:
 
     with wrap_context('parsing min_duration option'):
         min_duration = options.min_duration
-        min_duration_delta = _parse_duration(min_duration)
+        min_duration_delta = parse_duration(min_duration)
 
     with wrap_context('parsing default_start_time option'):
         default_start_time_str = options.default_start_time
@@ -63,7 +63,7 @@ def default_schedule_options() -> ScheduleOptions:
     return _parse_schedule_options(ScheduleOptionsJson())
 
 
-def _parse_duration(duration_str: str) -> timedelta:
+def parse_duration(duration_str: str) -> timedelta:
     if not duration_str:
         return timedelta(seconds=0)
 

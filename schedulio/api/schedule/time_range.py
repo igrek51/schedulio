@@ -71,7 +71,7 @@ def add_time(t: time, dt: timedelta) -> time:
     minutes = t.minute + (dt.seconds // 60) % 60
     hours += minutes // 60
     minutes = minutes % 60
-    if hours >= 23 and minutes >= 59:
+    if hours >= 24:
         hours = 23
         minutes = 59
     return time(hour=int(hours), minute=int(minutes), tzinfo=pytz.UTC)
