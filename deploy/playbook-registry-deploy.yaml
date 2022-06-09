@@ -1,0 +1,30 @@
+- hosts: all
+  tasks:
+    - name: create required directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items: "{{ component_dirs }}"
+
+    - name: copy volumes data
+      when: copy_volumes | bool
+      with_items: "{{ copy_volumes_data }}"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dst }}"
+
+    - name: template docker compose file
+      template:
+        src: docker-compose.yaml
+        dest: "{{ component_dir }}/docker-compose.yaml"
+
+    - name: pull docker image
+      command: "docker pull {{ registry_image_name }}"
+
+    - name: retag docker image
+      command: "docker tag {{ registry_image_name }} {{ component_name }}"
+
+    - name: ensure component container is running
+      command: "docker-compose up -d {{ component_name }}"
+      args:
+        chdir: "{{ component_dir }}"

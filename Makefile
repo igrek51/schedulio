@@ -52,11 +52,28 @@ frontend-run:
 frontend-build:
 	cd frontend && make build
 
+frontend-build-in-docker:
+	cd frontend && make build-in-docker-replace
+
+
+push-to-registry: build
+	docker login registry.gitlab.com
+	docker tag schedulio:latest registry.gitlab.com/igrek51/schedulio/schedulio:latest
+	docker push registry.gitlab.com/igrek51/schedulio/schedulio:latest
+
 
 deploy: build
 	cd deploy && \
-	ansible-playbook -i inventory.yaml deploy-playbook.yaml
+	ansible-playbook -i inventory.yaml playbook-deploy.yaml
 
 deploy-with-volumes: build
 	cd deploy && \
-	ansible-playbook -i inventory.yaml deploy-playbook.yaml --extra-vars "copy_volumes=true"
+	ansible-playbook -i inventory.yaml playbook-deploy.yaml --extra-vars "copy_volumes=true"
+
+deploy-from-registry: push-to-registry
+	cd deploy && \
+	ansible-playbook -i inventory.yaml playbook-registry-deploy.yaml
+
+deploy-volumes: push-to-registry
+	cd deploy && \
+	ansible-playbook -i inventory.yaml playbook-copy-volumes.yaml

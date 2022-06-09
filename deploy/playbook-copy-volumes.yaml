@@ -1,0 +1,14 @@
+- hosts: all
+  tasks:
+    - name: create required directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items: "{{ component_dirs }}"
+
+    - name: copy volumes data
+      when: copy_volumes | bool
+      with_items: "{{ copy_volumes_data }}"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dst }}"
