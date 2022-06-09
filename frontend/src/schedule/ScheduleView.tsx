@@ -38,6 +38,7 @@ function ScheduleView() {
 
     const onTitleLoad = (title: string) => {
         titleRef.current!.setState({title: title});
+        document.title = `Schedulio: ${title}`;
     };
 
     const onBestMatchLoad = (bestMatch: BestMatch) => {

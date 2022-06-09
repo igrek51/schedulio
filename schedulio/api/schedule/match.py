@@ -156,7 +156,7 @@ def _count_conditional_votes(
     end_time = time(hour=23, minute=59, tzinfo=pytz.UTC)
 
     conditional_votes = sorted(conditional_votes, key=lambda x: x.start_time)
-    start_time_candidates = [vote.start_time for vote in conditional_votes]
+    start_time_candidates = [vote_range.start_time for vote_range in conditional_votes]
     for start_time_candidate in start_time_candidates:
 
         end_time_candidate = add_time(start_time_candidate, options.min_duration_delta)
