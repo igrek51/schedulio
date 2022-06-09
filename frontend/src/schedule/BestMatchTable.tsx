@@ -3,7 +3,7 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { BestMatch } from './ScheduleService';
-import { bestmatchCellRenderer } from "./grid.js";
+import { activateBootstrapTooltips, bestmatchCellRenderer } from "./grid.js";
 
 registerAllModules();
 
@@ -84,6 +84,14 @@ export class BestMatchTable extends React.Component<any, any> {
             className: 'htCenter htMiddle',
             manualColumnResize: true,
             outsideClickDeselects: true,
+            afterInit: function () {
+                activateBootstrapTooltips()
+            },
+            afterViewRender: function (isForced: boolean) {
+                if (isForced) {
+                    activateBootstrapTooltips()
+                }
+            },
             licenseKey: 'non-commercial-and-evaluation',
         };
 

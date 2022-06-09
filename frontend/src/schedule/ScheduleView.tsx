@@ -166,12 +166,12 @@ function ScheduleView() {
                     </div>
                 </div>
 
-                <div className="grid-container">
+                <div>
                     <GridComponent ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4 data-toggle="tooltip" data-placement="left" title="Best match is a day with the most confirmed participants">
+                    <h4>
                         <StarBorderIcon fontSize="large"/> Best match
                     </h4>
                     <BestMatchTable ref={bestMatchRef}/>

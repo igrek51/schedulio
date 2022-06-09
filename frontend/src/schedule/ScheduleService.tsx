@@ -54,7 +54,7 @@ export class ScheduleService {
     static scheduleId: string = '';
     static title: string = '...';
     static scheduleOptions: string | null = '';
-    static guests: Array<Guest> = [];
+    static guests: Guest[] = [];
     static dayVotes: Array<DayVotes> = [];
     static guestsById: Record<string, Guest> = {};
     static guestIdToIndex: Record<string, number> = {};
