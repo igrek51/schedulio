@@ -23,6 +23,8 @@ def parse_time_range(string: str) -> TimeRange:
         end = match.group(2)
         start_time = parse_time(start)
         end_time = parse_time(end)
+        if start_time > end_time:
+            end_time = time(hour=23, minute=59, tzinfo=pytz.UTC)
         return TimeRange(
             start_time=start_time,
             end_time=end_time,
