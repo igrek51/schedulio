@@ -10,26 +10,6 @@ from schedulio.api.schedule.options import ScheduleOptions
 from schedulio.api.schedule.time_range import TimeRange, add_time, parse_time_range
 
 
-def find_match_most_participants(
-    min_date: datetime, max_date: datetime, 
-    guests: List[schemas.Guest],
-    day_guest_vote_map: Dict[int, Dict[str, str]],
-    options: ScheduleOptions,
-) -> Optional[schemas.BestMatch]:
-
-    def _match_condition(match: schemas.BestMatch) -> bool:
-        return match.max_guests >= options.min_guests
-
-    def _match_score(match: schemas.BestMatch) -> float:
-        return match.min_guests
-
-    best_match = _find_best_match(
-        min_date, max_date, guests, day_guest_vote_map,
-        _match_condition, _match_score, 'most_participants', options,
-    )
-    return best_match
-
-
 class ConditionalVote(BaseModel):
     guest_id: str
     time_range: TimeRange
@@ -44,15 +24,64 @@ class TimeMatch(BaseModel):
     guest_results_map: Dict[str, str] = {}  # guest id -> final result
 
 
+class StopFurtherSearch(Exception):
+    pass
+
+
+def find_match_most_participants(
+    min_date: datetime, max_date: datetime, 
+    guests: List[schemas.Guest],
+    day_guest_vote_map: Dict[int, Dict[str, str]],
+    options: ScheduleOptions,
+) -> Optional[schemas.BestMatch]:
+
+    def _match_condition(match: schemas.BestMatch) -> bool:
+        return match.max_guests >= options.min_guests
+
+    def _match_score(match: schemas.BestMatch) -> float:
+        return match.min_guests
+
+    best_match = _find_best_match(
+        min_date, max_date, guests, day_guest_vote_map, 'most_participants', options,
+        _match_condition, _match_score,
+    )
+    return best_match
+
+
+def find_match_earliest_min(
+    min_date: datetime, max_date: datetime, 
+    guests: List[schemas.Guest],
+    day_guest_vote_map: Dict[int, Dict[str, str]],
+    options: ScheduleOptions,
+) -> Optional[schemas.BestMatch]:
+
+    def _match_condition(match: schemas.BestMatch) -> bool:
+        min_guests = options.min_guests or 1
+        return match.max_guests >= min_guests
+
+    def _match_score(match: schemas.BestMatch) -> float:
+        return 0
+
+    def _on_best_found(match: schemas.BestMatch) -> float:
+        raise StopFurtherSearch()
+
+    best_match = _find_best_match(
+        min_date, max_date, guests, day_guest_vote_map, 'earliest_min', options,
+        _match_condition, _match_score, _on_best_found,
+    )
+    return best_match
+
+
 def _find_best_match(
     min_date: datetime,
     max_date: datetime,
     guests: List[schemas.Guest],
     day_guest_vote_map: Dict[int, Dict[str, str]],
-    match_condition: Callable[[schemas.BestMatch], bool],
-    match_score: Callable[[schemas.BestMatch], float],
     algorithm: str,
     options: ScheduleOptions,
+    match_condition: Callable[[schemas.BestMatch], bool],
+    match_score: Callable[[schemas.BestMatch], float],
+    on_best_found: Callable[[schemas.BestMatch], float] = None,
 ) -> Optional[schemas.BestMatch]:
     guest_ids = [guest.id for guest in guests]
     all_guest_names = [guest.name for guest in guests]
@@ -60,35 +89,41 @@ def _find_best_match(
     best_match: Optional[schemas.BestMatch] = None
     best_score: float = 0
 
-    for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
+    try:
+        for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
 
-        guest_votes: Dict[str, str] = day_guest_vote_map.get(day_timestamp, {})
-        time_match = _find_best_time_match(guest_votes, guest_ids, options)
-        start_time = time_match.start_time.strftime("%H:%M")
-        end_time = time_match.end_time.strftime("%H:%M")
-        guest_results = [time_match.guest_results_map.get(guest_id) for guest_id in guest_ids]
+            guest_votes: Dict[str, str] = day_guest_vote_map.get(day_timestamp, {})
+            time_match = _find_best_time_match(guest_votes, guest_ids, options)
+            start_time = time_match.start_time.strftime("%H:%M")
+            end_time = time_match.end_time.strftime("%H:%M")
+            guest_results = [time_match.guest_results_map.get(guest_id) for guest_id in guest_ids]
 
-        match = schemas.BestMatch(
-            day_timestamp=day_timestamp,
-            day_name=get_day_name(day_date),
-            day_date=day_date,
-            start_time=start_time,
-            end_time=end_time,
-            min_guests=time_match.min_guests,
-            max_guests=time_match.max_guests,
-            total_guests=len(guests),
-            algorithm=algorithm,
-            place=1,
-            guest_votes=time_match.guest_votes_ordered,
-            all_guest_names=all_guest_names,
-            guest_results=guest_results,
-        )
+            match = schemas.BestMatch(
+                day_timestamp=day_timestamp,
+                day_name=get_day_name(day_date),
+                day_date=day_date,
+                start_time=start_time,
+                end_time=end_time,
+                min_guests=time_match.min_guests,
+                max_guests=time_match.max_guests,
+                total_guests=len(guests),
+                algorithm=algorithm,
+                place=1,
+                guest_votes=time_match.guest_votes_ordered,
+                all_guest_names=all_guest_names,
+                guest_results=guest_results,
+            )
 
-        if match_condition(match):
-            score = match_score(match)
-            if best_match is None or score > best_score:
-                best_match = match
-                best_score = score
+            if match_condition(match):
+                score = match_score(match)
+                if best_match is None or score > best_score:
+                    best_match = match
+                    best_score = score
+                    if on_best_found is not None:
+                        on_best_found(match)
+
+    except StopFurtherSearch:
+        pass
     
     return best_match
 

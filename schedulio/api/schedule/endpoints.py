@@ -19,6 +19,7 @@ from schedulio.api.schedule.database import (
     update_schedule,
 )
 from schedulio.api.schedule.schedule import (
+    find_schedule_match_earliest_min,
     get_guest_votes, 
     get_schedule_schema, 
     get_schedule_votes, 
@@ -110,3 +111,7 @@ def setup_endpoints(app: FastAPI):
     @app.get("/api/schedule/{schedule_id}/match/most_participants", response_model=schemas.BestMatch)
     def _find_best_match_most_participants(schedule_id: str):
         return find_schedule_match_most_participants(schedule_id)
+
+    @app.get("/api/schedule/{schedule_id}/match/earliest_min", response_model=schemas.BestMatch)
+    def _find_best_match_earliest_min(schedule_id: str):
+        return find_schedule_match_earliest_min(schedule_id)
