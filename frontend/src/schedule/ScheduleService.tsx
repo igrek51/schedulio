@@ -69,12 +69,14 @@ export class ScheduleService {
     static hotRef: React.RefObject<HotTable>;
     static scheduleGridRef: React.RefObject<GridComponent>;
     static timestampToDayOfWeek: Record<string, number> = {};
-    static bestMatchDayName: string = '';
-    static guestResults: string[] = [];
+
+    static matchMostDayName: string = '';
+    static matchEarliestDayName: string = '';
+    static matchMostGuestResults: string[] = [];
+    static matchEarliestGuestResults: string[] = [];
 
     static fetchData(
         onTitleLoad: (title: string) => void,
-        onBestMatchLoad: (bestMatch: BestMatch) => void,
         ) {
         console.log('loading data...');
 
@@ -128,15 +130,15 @@ export class ScheduleService {
             .then(response => {
                 const bestMatch: BestMatch = response.data
                 if (bestMatch === null) {
-                    this.bestMatchDayName = ''
-                    this.guestResults = []
+                    this.matchMostDayName = ''
+                    this.matchMostGuestResults = []
                 } else {
-                    this.bestMatchDayName = bestMatch.day_name
-                    this.guestResults = bestMatch.guest_results
+                    this.matchMostDayName = bestMatch.day_name
+                    this.matchMostGuestResults = bestMatch.guest_results
                 }
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()
-                onBestMatchLoad(bestMatch)
+                CallbackHell.onLoadBestMatch(bestMatch)
 
             }).catch(err => {
                 ToastService.showAxiosError(`Fetching matches`, err)
@@ -146,15 +148,15 @@ export class ScheduleService {
             .then(response => {
                 const bestMatch: BestMatch = response.data
                 if (bestMatch === null) {
-                    this.bestMatchDayName = ''
-                    this.guestResults = []
+                    this.matchEarliestDayName = ''
+                    this.matchEarliestGuestResults = []
                 } else {
-                    this.bestMatchDayName = bestMatch.day_name
-                    this.guestResults = bestMatch.guest_results
+                    this.matchEarliestDayName = bestMatch.day_name
+                    this.matchEarliestGuestResults = bestMatch.guest_results
                 }
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()
-                onBestMatchLoad(bestMatch)
+                CallbackHell.onLoadEarliestMatch(bestMatch)
 
             }).catch(err => {
                 ToastService.showAxiosError(`Fetching matches`, err)

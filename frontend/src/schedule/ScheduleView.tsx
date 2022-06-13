@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
 
-import { BestMatch, ScheduleService } from './ScheduleService';
+import { ScheduleService } from './ScheduleService';
 import {EventTitleView} from './EventTitleView';
 import { TimeRangeField } from './TimeRangeField';
 import BestMatchTable from './BestMatchTable';
@@ -41,15 +41,11 @@ function ScheduleView() {
         document.title = `Schedulio: ${title}`;
     };
 
-    const onBestMatchLoad = (bestMatch: BestMatch) => {
-        bestMatchRef.current!.setBestMatch(bestMatch);
-    }
-
     useEffect(() => {
         ScheduleService.scheduleGridRef = scheduleGridRef;
         ScheduleService.hotRef = scheduleGridRef.current!.hotTableRef;
 
-        ScheduleService.fetchData(onTitleLoad, onBestMatchLoad);
+        ScheduleService.fetchData(onTitleLoad);
 
         activateBootstrapTooltips()
     }, []);

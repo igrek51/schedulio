@@ -2,8 +2,9 @@ import React from "react";
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
-import { BestMatch } from './ScheduleService';
+import { BestMatch, ScheduleService } from './ScheduleService';
 import { activateBootstrapTooltips, bestmatchCellRenderer } from "./grid.js";
+import { CallbackHell } from "./CallbackHell";
 
 registerAllModules();
 
@@ -12,6 +13,8 @@ export class BestMatchTable extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
     tableData: string[][];
+    bestMatchMost: BestMatch | null = null;
+    earliestMatch: BestMatch | null = null;
 
     constructor(props: any) {
         super(props);
@@ -19,15 +22,23 @@ export class BestMatchTable extends React.Component<any, any> {
         this.tableData = [
             ['Criteria', 'Day', 'Time', 'Participants'],
         ]
+        CallbackHell.onLoadBestMatch = (bestMatch: BestMatch | null) => { this.onLoadBestMatch(bestMatch) }
+        CallbackHell.onLoadEarliestMatch = (bestMatch: BestMatch | null) => { this.onLoadEarliestMatch(bestMatch) }
     }
 
-    setBestMatch(bestMatch: BestMatch | null) {
-        if (bestMatch) {
-            let headerRow = ['Criteria', 'Day', 'Time', 'Participants']
-            for (const name of bestMatch.all_guest_names) {
-                headerRow.push(name)
-            }
+    onLoadBestMatch(bestMatch: BestMatch | null) {
+        this.bestMatchMost = bestMatch
+        this.updateTable()
+    }
     
+    onLoadEarliestMatch(bestMatch: BestMatch | null) {
+        this.earliestMatch = bestMatch
+        this.updateTable()
+    }
+
+    getBestMatchRow(bestMatch: BestMatch | null, algorithm: string): string[] {
+        if (bestMatch) {
+
             let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
             let participantsCell: string
             if (bestMatch.min_guests === bestMatch.max_guests) {
@@ -35,8 +46,9 @@ export class BestMatchTable extends React.Component<any, any> {
             } else {
                 participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
             }
+
             let resultRow = [
-                'Most Participants',
+                algorithm,
                 bestMatch.day_name,
                 timerange,
                 participantsCell,
@@ -45,16 +57,26 @@ export class BestMatchTable extends React.Component<any, any> {
                 resultRow.push(vote)
             }
     
-            this.tableData = [
-                headerRow,
-                resultRow,
-            ]
+            return resultRow
         } else {
-            this.tableData = [
-                ['Criteria', 'Day', 'Time', 'Participants'],
-                ['Most Participants', 'Can\'t find any day matching your criteria (insufficient participants)', '', ''],
-            ]
+            return [algorithm, 'No match (insufficient guests)', '-', '-']
         }
+    }
+
+    updateTable() {
+        let headerRow = ['Criteria', 'Day', 'Time', 'Participants']
+        for (const guest of ScheduleService.guests) {
+            headerRow.push(guest.name)
+        }
+
+        let matchMostRow = this.getBestMatchRow(this.bestMatchMost, 'Most Participants')
+        let earliestMatchRow = this.getBestMatchRow(this.earliestMatch, 'Earliest Match')
+
+        this.tableData = [
+            headerRow,
+            matchMostRow,
+            earliestMatchRow,
+        ]
     
         let hot = this.hotTableRef.current!.hotInstance!;
         hot.updateData(this.tableData)
@@ -74,7 +96,7 @@ export class BestMatchTable extends React.Component<any, any> {
             width: 'auto',
             height: 'auto',
             colWidths(index: number) {
-                if (index === 0) {
+                if (index <= 1) {
                     return 150
                 }
                 return 100

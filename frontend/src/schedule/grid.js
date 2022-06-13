@@ -41,7 +41,7 @@ export function cellRenderer(instance, td, row, col, prop, value, cellProperties
             tooltip = 'Click to show more days'
         }
 
-        if (ScheduleService.bestMatchDayName !== '' && ScheduleService.bestMatchDayName === value) {
+        if (ScheduleService.matchMostDayName !== '' && ScheduleService.matchMostDayName === value) {
             html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="StarBorderIcon"><path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></svg> ${html}`
             if (row === 1) {
                 tooltip = `Best Match (It's today!)`
@@ -93,18 +93,27 @@ export function bestmatchCellRenderer(instance, td, row, col, prop, value, cellP
     if (row === 0) {
         td.style.background = '#F8F9FA'
         td.style.fontWeight = 'bold'
-    } else if (row > 0 && col === 0) {
-        if (ScheduleService.bestMatchDayName !== '' && ScheduleService.bestMatchDayName === value) {
+    } else if (row > 0 && col === 1) {
+        if (ScheduleService.matchMostDayName !== '' && ScheduleService.matchMostDayName === value) {
             html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="StarBorderIcon"><path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></svg> ${html}`
             tooltip = `Best Match - day with the most confirmed participants`
         }
 
-    } else if (row > 0 && col == 2) {
+    } else if (row > 0 && col == 3) {
         tooltip = `Number of confirmed - potential participants of total guests`
 
-    } else if (row > 0 && col > 2) {
-        const guestIndex = col - 3
-        const guestResult = ScheduleService.guestResults[guestIndex]
+    } else if (row > 0 && col > 3) {
+        const guestIndex = col - 4
+
+        let guestResultsMap = []
+        if (row == 1) {
+            guestResultsMap = ScheduleService.matchMostGuestResults
+
+        } else if (row == 2) {
+            guestResultsMap = ScheduleService.matchEarliestGuestResults
+        }
+
+        const guestResult = guestResultsMap[guestIndex]
         if (guestResult) {
             const guest = ScheduleService.guests[guestIndex]
 
