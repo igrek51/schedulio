@@ -6,22 +6,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { ScheduleService } from "../schedule/ScheduleService";
+import { ScheduleService, ScheduleOptions } from "../schedule/ScheduleService";
 import { ToastService } from "../schedule/ToastService";
 import { CallbackHell } from "../schedule/CallbackHell";
 import { useNavigate } from "react-router-dom";
+
 
 export default function CreateScheduleDialog(props: any) {
 
     const [open, setOpen] = React.useState(false);
     const [eventName, setEventName] = React.useState('');
-    const [optionsValue, setOptionsValue] = React.useState('');
-    const inputReference = React.useRef<any>(null);
 
     const handleClickOpen = () => {
         setOpen(true);
         setEventName('');
-        setOptionsValue('');
     };
 
     const handleClose = () => {
@@ -37,7 +35,14 @@ export default function CreateScheduleDialog(props: any) {
         if (eventName.length === 0) {
             ToastService.toastError('Event Name is required')
         } else {
-            ScheduleService.createSchedule(eventName, optionsValue, onSuccessfulCreate)
+            const options: ScheduleOptions = {
+                min_guests: null,
+                min_duration: null,
+                default_start_time: null,
+                default_end_time: null,
+            }
+            const optionsJson = JSON.stringify(options);
+            ScheduleService.createSchedule(eventName, optionsJson, onSuccessfulCreate)
         }
         handleClose()
     };
@@ -65,7 +70,6 @@ export default function CreateScheduleDialog(props: any) {
                         Event name (required):
                     </DialogContentText>
                     <TextField
-                        ref={inputReference}
                         autoFocus
                         margin="dense"
                         id="inputEventName"
@@ -76,18 +80,6 @@ export default function CreateScheduleDialog(props: any) {
                         onKeyDown={handleKeyDown} 
                     />
 
-                    <DialogContentText>
-                        Options (optional settings in JSON format):
-                    </DialogContentText>
-                    <TextField
-                        id="textfield-schedule-options"
-                        label="Options"
-                        multiline
-                        fullWidth
-                        rows={5}
-                        variant="outlined"
-                        value={optionsValue} onChange={(e: any) => { setOptionsValue(e.target.value) }}
-                        />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>

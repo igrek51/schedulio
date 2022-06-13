@@ -17,24 +17,26 @@ export class BestMatchTable extends React.Component<any, any> {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
         this.tableData = [
-            ['Day', 'Time', 'Participants'],
+            ['Criteria', 'Day', 'Time', 'Participants'],
         ]
     }
 
     setBestMatch(bestMatch: BestMatch | null) {
         if (bestMatch) {
-            let headerRow = ['Day', 'Time', 'Participants']
+            let headerRow = ['Criteria', 'Day', 'Time', 'Participants']
             for (const name of bestMatch.all_guest_names) {
                 headerRow.push(name)
             }
     
             let timerange = `${bestMatch.start_time} - ${bestMatch.end_time}`
-            if (bestMatch.min_guests == bestMatch.max_guests) {
-                var participantsCell = `${bestMatch.min_guests} / ${bestMatch.total_guests}`
+            let participantsCell: string
+            if (bestMatch.min_guests === bestMatch.max_guests) {
+                participantsCell = `${bestMatch.min_guests} / ${bestMatch.total_guests}`
             } else {
-                var participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
+                participantsCell = `${bestMatch.min_guests}-${bestMatch.max_guests} / ${bestMatch.total_guests}`
             }
             let resultRow = [
+                'Most Participants',
                 bestMatch.day_name,
                 timerange,
                 participantsCell,
@@ -49,8 +51,8 @@ export class BestMatchTable extends React.Component<any, any> {
             ]
         } else {
             this.tableData = [
-                ['Day', 'Time', 'Participants'],
-                ['Can\'t find any day matching your criteria (insufficient participants)', '', ''],
+                ['Criteria', 'Day', 'Time', 'Participants'],
+                ['Most Participants', 'Can\'t find any day matching your criteria (insufficient participants)', '', ''],
             ]
         }
     

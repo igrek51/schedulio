@@ -28,10 +28,20 @@ def parse_schedule_options_json(options_json_str: Optional[str]) -> ScheduleOpti
         with wrap_context('parsing JSON'):
             options_dict = json.loads(options_json_str)
         with wrap_context('parsing options fields'):
+            options_dict = _remove_null_values(options_dict)
             options = ScheduleOptionsJson.parse_obj(options_dict)
     else:
         options = ScheduleOptionsJson()
     return _parse_schedule_options(options)
+
+
+def _remove_null_values(obj):
+    if isinstance(obj, list):
+        return [_remove_null_values(x) for x in obj if x is not None]
+    elif isinstance(obj, dict):
+        return {k: _remove_null_values(v) for k, v in obj.items() if k is not None and v is not None}
+    else:
+        return obj
 
 
 def _parse_schedule_options(options: ScheduleOptionsJson) -> ScheduleOptions:

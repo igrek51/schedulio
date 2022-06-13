@@ -50,10 +50,18 @@ export interface BestMatch {
     place: number | null;
 }
 
+export interface ScheduleOptions {
+    min_guests: number | null;
+    min_duration: string | null;
+    default_start_time: string | null;
+    default_end_time: string | null;
+}
+
 export class ScheduleService {
     static scheduleId: string = '';
     static title: string = '...';
-    static scheduleOptions: string | null = '';
+    static scheduleOptionsJson: string | null = '';
+    static scheduleOptions: ScheduleOptions | null;
     static guests: Guest[] = [];
     static dayVotes: Array<DayVotes> = [];
     static guestsById: Record<string, Guest> = {};
@@ -74,7 +82,17 @@ export class ScheduleService {
             .then(response => {
                 const schedule: Schedule = response.data;
                 this.title = schedule.title;
-                this.scheduleOptions = schedule.options;
+                this.scheduleOptionsJson = schedule.options;
+                if (schedule.options === null || schedule.options === '') {
+                    this.scheduleOptions = {
+                        min_guests: null,
+                        min_duration: null,
+                        default_start_time: null,
+                        default_end_time: null,
+                    }
+                } else {
+                    this.scheduleOptions = JSON.parse(schedule.options)
+                }
                 onTitleLoad(this.title);
 
             }).catch(err => {
@@ -107,6 +125,24 @@ export class ScheduleService {
             });
 
         axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
+            .then(response => {
+                const bestMatch: BestMatch = response.data
+                if (bestMatch === null) {
+                    this.bestMatchDayName = ''
+                    this.guestResults = []
+                } else {
+                    this.bestMatchDayName = bestMatch.day_name
+                    this.guestResults = bestMatch.guest_results
+                }
+                let hot = this.hotRef.current!.hotInstance!;
+                hot.render()
+                onBestMatchLoad(bestMatch)
+
+            }).catch(err => {
+                ToastService.showAxiosError(`Fetching matches`, err)
+            });
+
+        axios.get(`/api/schedule/${this.scheduleId}/match/earliest_min`)
             .then(response => {
                 const bestMatch: BestMatch = response.data
                 if (bestMatch === null) {
@@ -336,11 +372,11 @@ export class ScheduleService {
 
     static updateSchedule(eventName: string, optionsValue: string) {
         this.title = eventName
-        this.scheduleOptions = optionsValue
+        this.scheduleOptionsJson = optionsValue
         axios.put(`/api/schedule/${this.scheduleId}`, {
             path_id: this.scheduleId,
             title: this.title,
-            options: this.scheduleOptions,
+            options: this.scheduleOptionsJson,
         })
             .then(response => {
 
