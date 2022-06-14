@@ -76,5 +76,5 @@ class ScheduleAllInOne(BaseModel):
     schedule: Schedule
     guests: List[Guest]
     day_votes: List[DayVotes]
-    match_most_participants: BestMatch
-    match_soonest_possible: BestMatch
+    match_most_participants: Optional[BestMatch]
+    match_soonest_possible: Optional[BestMatch]

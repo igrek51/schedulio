@@ -260,7 +260,7 @@ export class ScheduleService {
         let guestId: string = ''
 
         if (voteChanges.length === 0) {
-            ToastService.toastError(`You must select at least one cell`);
+            ToastService.toastError(`You must select at least one cell first`);
             return
         }
     

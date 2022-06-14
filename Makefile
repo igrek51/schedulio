@@ -62,7 +62,7 @@ push-to-registry: build
 	docker push registry.gitlab.com/igrek51/schedulio/schedulio:latest
 
 
-deploy: build
+deploy-from-tar: build
 	cd deploy && \
 	ansible-playbook -i inventory.yaml playbook-deploy.yaml
 
@@ -77,3 +77,5 @@ deploy-from-registry: push-to-registry
 deploy-volumes: push-to-registry
 	cd deploy && \
 	ansible-playbook -i inventory.yaml playbook-copy-volumes.yaml
+
+deploy: deploy-from-registry

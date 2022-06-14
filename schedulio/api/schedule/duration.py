@@ -18,7 +18,7 @@ class Duration(object):
                            r'((?P<minutes>\d+)m(?!s))?'  # not confuse minutes with millis
                            r'((?P<seconds>\d+)s)?'
                            r'((?P<milliseconds>\d+)ms)?')
-        match = regex.match(duration_str)
+        match = regex.fullmatch(duration_str)
         if not match:
             raise ValueError(f'Invalid duration format: {duration_str}')
 

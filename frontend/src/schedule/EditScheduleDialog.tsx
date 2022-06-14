@@ -66,6 +66,7 @@ export default function EditScheduleDialog(props: any) {
         }
         const optionsJson = JSON.stringify(options);
         ScheduleService.updateSchedule(eventName, optionsJson)
+        ScheduleService.scheduleOptions = options
     }
 
 
@@ -125,7 +126,7 @@ export default function EditScheduleDialog(props: any) {
                     <Collapse in={advancedOn}>
 
                         <DialogContentText>
-                            Minimum number of guests (optional):
+                            Minimum number of guests (optional), eg. "4":
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -137,7 +138,7 @@ export default function EditScheduleDialog(props: any) {
                         />
 
                         <DialogContentText>
-                            Minimum event duration (optional):
+                            Minimum event duration (optional), eg. "2h30m":
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -149,7 +150,7 @@ export default function EditScheduleDialog(props: any) {
                         />
 
                         <DialogContentText>
-                            Default event start time (optional):
+                            Default event start time (optional), eg. "19:00":
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -161,7 +162,7 @@ export default function EditScheduleDialog(props: any) {
                         />
 
                         <DialogContentText>
-                            Default event end time (optional):
+                            Default event end time (optional), eg. "23:00":
                         </DialogContentText>
                         <TextField
                             autoFocus

@@ -170,7 +170,7 @@ function ScheduleView() {
                     <BestMatchTable algorithm="most_participants"/>
                     
                     <Collapse in={soonestMatchVisible}>
-                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="First day with the possible participants more than minimum threshold">
+                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="First day with the number of possible participants more than minimum threshold">
                         <BoltIcon fontSize="large"/> Soonest possible match
                     </h4>
                     <BestMatchTable algorithm="soonest_possible"/>
