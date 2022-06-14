@@ -48,7 +48,7 @@ def find_match_most_participants(
     return best_match
 
 
-def find_match_earliest_min(
+def find_match_soonest_possible(
     min_date: datetime, max_date: datetime, 
     guests: List[schemas.Guest],
     day_guest_vote_map: Dict[int, Dict[str, str]],
@@ -66,7 +66,7 @@ def find_match_earliest_min(
         raise StopFurtherSearch()
 
     best_match = _find_best_match(
-        min_date, max_date, guests, day_guest_vote_map, 'earliest_min', options,
+        min_date, max_date, guests, day_guest_vote_map, 'soonest_possible', options,
         _match_condition, _match_score, _on_best_found,
     )
     return best_match

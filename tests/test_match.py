@@ -1,6 +1,6 @@
 from typing import Dict
 from schedulio.api.schedule import schemas
-from schedulio.api.schedule.match import find_match_most_participants, find_match_earliest_min
+from schedulio.api.schedule.match import find_match_most_participants, find_match_soonest_possible
 from schedulio.api.schedule.options import default_schedule_options, parse_schedule_options_json
 from schedulio.api.schedule.time import timestamp_to_datetime
 
@@ -133,7 +133,7 @@ def test_no_match_because_insufficient_guests():
     assert best_match is None
 
 
-def test_best_match_earliest_min():
+def test_best_match_soonest_possible():
 
     today_timestamp = 1654006601
     min_date = timestamp_to_datetime(today_timestamp) # Tue 2022-05-31
@@ -164,7 +164,7 @@ def test_best_match_earliest_min():
     options = default_schedule_options()
     options.min_guests = 2
 
-    best_match: schemas.BestMatch = find_match_earliest_min(
+    best_match: schemas.BestMatch = find_match_soonest_possible(
         min_date, max_date, guests, day_guest_vote_map, options,
     )
 

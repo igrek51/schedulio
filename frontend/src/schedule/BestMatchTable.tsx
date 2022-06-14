@@ -13,26 +13,26 @@ export class BestMatchTable extends React.Component<any, any> {
 
     hotTableRef: React.RefObject<HotTable>;
     tableData: string[][];
-    bestMatchMost: BestMatch | null = null;
-    earliestMatch: BestMatch | null = null;
+    bestMatch: BestMatch | null = null;
+    algorithm: string = "";
 
     constructor(props: any) {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
         this.tableData = [
-            ['Criteria', 'Day', 'Time', 'Participants'],
+            ['Day', 'Time', 'Participants'],
         ]
-        CallbackHell.onLoadBestMatch = (bestMatch: BestMatch | null) => { this.onLoadBestMatch(bestMatch) }
-        CallbackHell.onLoadEarliestMatch = (bestMatch: BestMatch | null) => { this.onLoadEarliestMatch(bestMatch) }
+        this.algorithm = props.algorithm
+
+        if (this.algorithm == 'most_participants') {
+            CallbackHell.onLoadBestMatch = (bestMatch: BestMatch | null) => { this.onLoadMatch(bestMatch) }
+        } else if (this.algorithm == 'soonest_possible') {
+            CallbackHell.onLoadSoonestMatch = (bestMatch: BestMatch | null) => { this.onLoadMatch(bestMatch) }
+        }
     }
 
-    onLoadBestMatch(bestMatch: BestMatch | null) {
-        this.bestMatchMost = bestMatch
-        this.updateTable()
-    }
-    
-    onLoadEarliestMatch(bestMatch: BestMatch | null) {
-        this.earliestMatch = bestMatch
+    onLoadMatch(bestMatch: BestMatch | null) {
+        this.bestMatch = bestMatch
         this.updateTable()
     }
 
@@ -48,7 +48,6 @@ export class BestMatchTable extends React.Component<any, any> {
             }
 
             let resultRow = [
-                algorithm,
                 bestMatch.day_name,
                 timerange,
                 participantsCell,
@@ -59,23 +58,21 @@ export class BestMatchTable extends React.Component<any, any> {
     
             return resultRow
         } else {
-            return [algorithm, 'No match (insufficient guests)', '-', '-']
+            return ['No match (insufficient guests)', '-', '-']
         }
     }
 
     updateTable() {
-        let headerRow = ['Criteria', 'Day', 'Time', 'Participants']
+        let headerRow = ['Day', 'Time', 'Participants']
         for (const guest of ScheduleService.guests) {
             headerRow.push(guest.name)
         }
 
-        let matchMostRow = this.getBestMatchRow(this.bestMatchMost, 'Most Participants')
-        let earliestMatchRow = this.getBestMatchRow(this.earliestMatch, 'Earliest Match')
+        let matchRow = this.getBestMatchRow(this.bestMatch, this.algorithm)
 
         this.tableData = [
             headerRow,
-            matchMostRow,
-            earliestMatchRow,
+            matchRow,
         ]
     
         let hot = this.hotTableRef.current!.hotInstance!;
@@ -84,6 +81,8 @@ export class BestMatchTable extends React.Component<any, any> {
 
 
     render() {
+
+        const self = this;
 
         function cellRenderer(
             instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, 
@@ -98,31 +97,35 @@ export class BestMatchTable extends React.Component<any, any> {
             if (row === instance.countRows() - 1) {
                 tooltipPlacement = 'bottom'
             } 
-            if (col == 0) {
+            if (col === 0) {
                 tooltipPlacement = 'left'
             }
 
             if (row === 0) {
                 td.style.background = '#F8F9FA'
                 td.style.fontWeight = 'bold'
-            } else if (row > 0 && col === 1) {
-                if (ScheduleService.matchMostDayName !== '' && ScheduleService.matchMostDayName === value) {
+            } else if (row > 0 && col === 0) {
+
+                if (self.algorithm === 'most_participants' && ScheduleService.bestMatchDayName !== '' && ScheduleService.bestMatchDayName === value) {
                     html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="StarBorderIcon"><path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></svg> ${html}`
                     tooltip = `Best Match - day with the most confirmed participants`
                 }
+                if (self.algorithm === 'soonest_possible' && ScheduleService.soonestMatchDayName !== '' && ScheduleService.soonestMatchDayName === value) {
+                    html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="BoltIcon"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"></path></svg> ${html}`
+                    tooltip = `Soonest Possible Match - first day with the possible participants more than minimum threshold`
+                }
 
-            } else if (row > 0 && col == 3) {
+            } else if (row > 0 && col === 2) {
                 tooltip = `Number of confirmed - potential participants of total guests`
 
-            } else if (row > 0 && col > 3) {
-                const guestIndex = col - 4
+            } else if (row > 0 && col >= 3) {
+                const guestIndex = col - 3
 
                 let guestResultsMap: string[] = []
-                if (row == 1) {
-                    guestResultsMap = ScheduleService.matchMostGuestResults
-
-                } else if (row == 2) {
-                    guestResultsMap = ScheduleService.matchEarliestGuestResults
+                if (self.algorithm === 'most_participants') {
+                    guestResultsMap = ScheduleService.bestMatchGuestResults
+                } else if (self.algorithm === 'soonest_possible') {
+                    guestResultsMap = ScheduleService.soonestMatchGuestResults
                 }
 
                 const guestResult = guestResultsMap[guestIndex]
@@ -172,7 +175,7 @@ export class BestMatchTable extends React.Component<any, any> {
             width: 'auto',
             height: 'auto',
             colWidths(index: number) {
-                if (index <= 1) {
+                if (index < 1) {
                     return 150
                 }
                 return 100

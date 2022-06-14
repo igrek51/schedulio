@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
+import BoltIcon from '@mui/icons-material/Bolt';
 
 import { ScheduleService } from './ScheduleService';
 import {EventTitleView} from './EventTitleView';
@@ -31,7 +32,6 @@ function ScheduleView() {
     const titleRef = React.createRef<EventTitleView>();
     const scheduleGridRef = React.createRef<GridComponent>();
     const hoursFieldRef = React.createRef<TimeRangeField>();
-    const bestMatchRef = React.createRef<BestMatchTable>();
     
     const { scheduleId } = useParams();
     ScheduleService.scheduleId = scheduleId!;
@@ -48,7 +48,7 @@ function ScheduleView() {
         ScheduleService.fetchData(onTitleLoad);
 
         activateBootstrapTooltips()
-    }, []);
+    });
 
     CallbackHell.onTitleLoad = onTitleLoad
 
@@ -167,10 +167,15 @@ function ScheduleView() {
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4>
-                        <StarBorderIcon fontSize="large"/> Best match
+                    <h4 data-toggle="tooltip" data-placement="left" title="A day with the most confirmed participants">
+                        <StarBorderIcon fontSize="large"/> Best Match
                     </h4>
-                    <BestMatchTable ref={bestMatchRef}/>
+                    <BestMatchTable algorithm="most_participants"/>
+                    
+                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="A first day with the possible participants more than minimum threshold">
+                        <BoltIcon fontSize="large"/> Soonest Possible Match
+                    </h4>
+                    <BestMatchTable algorithm="soonest_possible"/>
                 </div>
 
             </Container>

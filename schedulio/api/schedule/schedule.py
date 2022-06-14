@@ -7,7 +7,7 @@ from schedulio.api.schedule.calendar import days_range, get_day_name
 from schedulio.api.schedule.match import (
     parse_time_range,
     find_match_most_participants,
-    find_match_earliest_min,
+    find_match_soonest_possible,
 )
 from schedulio.api.schedule.options import parse_schedule_options_json
 from schedulio.djangoapp import models
@@ -133,7 +133,7 @@ def find_schedule_match_most_participants(schedule_id: str) -> Optional[schemas.
     return find_match_most_participants(min_date, max_date, guests, day_guest_vote_map, options)
 
 
-def find_schedule_match_earliest_min(schedule_id: str) -> Optional[schemas.BestMatch]:
+def find_schedule_match_soonest_possible(schedule_id: str) -> Optional[schemas.BestMatch]:
     trim_old_votes_today()
     today: int = local_today_timestamp()
 
@@ -146,7 +146,7 @@ def find_schedule_match_earliest_min(schedule_id: str) -> Optional[schemas.BestM
     max_date = max_date + timedelta(days=1)
     min_date = timestamp_to_datetime(today)
 
-    return find_match_earliest_min(min_date, max_date, guests, day_guest_vote_map, options)
+    return find_match_soonest_possible(min_date, max_date, guests, day_guest_vote_map, options)
 
 
 def group_votes(votes: List[models.Vote], today: int) -> Tuple[Dict[int, Dict[str, str]], datetime]:
