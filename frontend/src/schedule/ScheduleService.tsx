@@ -57,6 +57,14 @@ export interface ScheduleOptions {
     default_end_time: string | null;
 }
 
+interface ScheduleAllInOne {
+    schedule: Schedule
+    guests: Guest[]
+    day_votes: DayVotes[]
+    match_most_participants: BestMatch
+    match_soonest_possible: BestMatch
+}
+
 export class ScheduleService {
     static scheduleId: string = '';
     static title: string = '...';
@@ -78,96 +86,97 @@ export class ScheduleService {
     static fetchData() {
         console.log('loading data...');
 
-        axios.get(`/api/schedule/${this.scheduleId}`)
-            .then(response => {
-                const schedule: Schedule = response.data;
-                this.title = schedule.title;
-                this.scheduleOptionsJson = schedule.options;
-                if (schedule.options === null || schedule.options === '') {
-                    this.scheduleOptions = {
-                        min_guests: null,
-                        min_duration: null,
-                        default_start_time: null,
-                        default_end_time: null,
-                    }
-                } else {
-                    this.scheduleOptions = JSON.parse(schedule.options)
+        const onFetchSchedule = (schedule: Schedule) => {
+            this.title = schedule.title;
+            this.scheduleOptionsJson = schedule.options;
+            if (schedule.options === null || schedule.options === '') {
+                this.scheduleOptions = {
+                    min_guests: null,
+                    min_duration: null,
+                    default_start_time: null,
+                    default_end_time: null,
                 }
-                CallbackHell.onTitleLoad(this.title);
+            } else {
+                this.scheduleOptions = JSON.parse(schedule.options)
+            }
+            CallbackHell.onTitleLoad(this.title);
+        }
+
+        const onFetchGuests = (guests: Guest[]) => {
+            const self: any = this;
+            guests.forEach(function (guest: Guest, i: number) {
+                self.guestsById[guest.id] = guest
+                self.guestIdToIndex[guest.id] = i
+            })
+            this.guests = guests
+            this.refreshAllVotes()
+        }
+
+        const onFetchDayVotes = (dayVotes: DayVotes[]) => {
+            this.dayVotes = dayVotes
+            this.refreshAllVotes()
+        }
+
+        const onFetchMatchMostParticipants = (bestMatch: BestMatch) => {
+            if (bestMatch === null) {
+                this.bestMatchDayName = ''
+                this.bestMatchGuestResults = []
+            } else {
+                this.bestMatchDayName = bestMatch.day_name
+                this.bestMatchGuestResults = bestMatch.guest_results
+            }
+
+            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+                CallbackHell.setSoonestMatchVisible(false)
+            }
+
+            let hot = this.hotRef.current!.hotInstance!;
+            hot.render()
+            CallbackHell.onLoadBestMatch(bestMatch)
+        }
+
+        const onFetchMatchSoonestPossible = (bestMatch: BestMatch) => {
+            if (bestMatch === null) {
+                this.soonestMatchDayName = ''
+                this.soonestMatchGuestResults = []
+            } else {
+                this.soonestMatchDayName = bestMatch.day_name
+                this.soonestMatchGuestResults = bestMatch.guest_results
+            }
+
+            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+                CallbackHell.setSoonestMatchVisible(false)
+            }
+
+            let hot = this.hotRef.current!.hotInstance!;
+            hot.render()
+            CallbackHell.onLoadSoonestMatch(bestMatch)
+        }
+
+        axios.get(`/api/schedule/${this.scheduleId}/all`)
+            .then(response => {
+                try {
+
+                    const scheduleAllInOne = response.data as ScheduleAllInOne
+                    const schedule: Schedule = scheduleAllInOne.schedule
+                    const guests: Guest[] = scheduleAllInOne.guests
+                    const dayVotes: DayVotes[] = scheduleAllInOne.day_votes
+                    const matchMostParticipants: BestMatch = scheduleAllInOne.match_most_participants
+                    const matchSoonestPossible: BestMatch = scheduleAllInOne.match_soonest_possible
+
+                    onFetchSchedule(schedule)
+                    onFetchGuests(guests)
+                    onFetchDayVotes(dayVotes)
+                    onFetchMatchMostParticipants(matchMostParticipants)
+                    onFetchMatchSoonestPossible(matchSoonestPossible)
+
+                } catch(e: unknown) {
+                    console.error(e);
+                    ToastService.toastError(`Fetching data: ${e}`)
+                }
 
             }).catch(err => {
-                ToastService.showAxiosError(`Fetching schedule`, err)
-            });
-
-        axios.get(`/api/schedule/${this.scheduleId}/guest`)
-            .then(response => {
-                const guests: Guest[] = response.data
-                const self: any = this;
-                guests.forEach(function (guest: Guest, i: number) {
-                    self.guestsById[guest.id] = guest
-                    self.guestIdToIndex[guest.id] = i
-                })
-                this.guests = guests
-                this.refreshAllVotes()
-
-            }).catch(err => {
-                ToastService.showAxiosError(`Fetching guests`, err)
-            });
-
-        axios.get(`/api/schedule/${this.scheduleId}/votes`)
-            .then(response => {
-                const dayVotes: DayVotes[] = response.data.day_votes
-                this.dayVotes = dayVotes
-                this.refreshAllVotes()
-
-            }).catch(err => {
-                ToastService.showAxiosError(`Fetching votes`, err)
-            });
-
-        axios.get(`/api/schedule/${this.scheduleId}/match/most_participants`)
-            .then(response => {
-                const bestMatch: BestMatch = response.data
-                if (bestMatch === null) {
-                    this.bestMatchDayName = ''
-                    this.bestMatchGuestResults = []
-                } else {
-                    this.bestMatchDayName = bestMatch.day_name
-                    this.bestMatchGuestResults = bestMatch.guest_results
-                }
-
-                if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
-                    CallbackHell.setSoonestMatchVisible(false)
-                }
-
-                let hot = this.hotRef.current!.hotInstance!;
-                hot.render()
-                CallbackHell.onLoadBestMatch(bestMatch)
-
-            }).catch(err => {
-                ToastService.showAxiosError(`Fetching matches`, err)
-            });
-
-        axios.get(`/api/schedule/${this.scheduleId}/match/soonest_possible`)
-            .then(response => {
-                const bestMatch: BestMatch = response.data
-                if (bestMatch === null) {
-                    this.soonestMatchDayName = ''
-                    this.soonestMatchGuestResults = []
-                } else {
-                    this.soonestMatchDayName = bestMatch.day_name
-                    this.soonestMatchGuestResults = bestMatch.guest_results
-                }
-
-                if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
-                    CallbackHell.setSoonestMatchVisible(false)
-                }
-
-                let hot = this.hotRef.current!.hotInstance!;
-                hot.render()
-                CallbackHell.onLoadSoonestMatch(bestMatch)
-
-            }).catch(err => {
-                ToastService.showAxiosError(`Fetching matches`, err)
+                ToastService.showAxiosError(`Fetching schedule data`, err)
             });
     }
 

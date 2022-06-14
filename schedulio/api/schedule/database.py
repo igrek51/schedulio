@@ -92,9 +92,10 @@ def create_new_guest(schedule: models.Schedule, guest: schemas.GuestCreate) -> m
 
 
 def update_guest(guest: models.Guest, name: str):
+    old_name = guest.name
     guest.name = name
     guest.save()
-    log.info('guest updated', new_name=name, guest_id=guest.id)
+    log.info('guest updated', old_name=old_name, new_name=name, guest_id=guest.id)
 
 
 def delete_guest(guest: models.Guest):

@@ -164,13 +164,13 @@ function ScheduleView() {
                 </div>
 
                 <div className="mt-4 mb-5">
-                    <h4 data-toggle="tooltip" data-placement="left" title="A day with the most confirmed participants">
+                    <h4 data-toggle="tooltip" data-placement="left" title="Day with the most confirmed participants">
                         <StarBorderIcon fontSize="large"/> Best match
                     </h4>
                     <BestMatchTable algorithm="most_participants"/>
                     
                     <Collapse in={soonestMatchVisible}>
-                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="A first day with the possible participants more than minimum threshold">
+                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="First day with the possible participants more than minimum threshold">
                         <BoltIcon fontSize="large"/> Soonest possible match
                     </h4>
                     <BestMatchTable algorithm="soonest_possible"/>

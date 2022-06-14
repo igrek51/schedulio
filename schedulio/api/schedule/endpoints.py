@@ -115,3 +115,26 @@ def setup_endpoints(app: FastAPI):
     @app.get("/api/schedule/{schedule_id}/match/soonest_possible", response_model=schemas.BestMatch)
     def _find_best_match_soonest_possible(schedule_id: str):
         return find_schedule_match_soonest_possible(schedule_id)
+
+
+    @app.get("/api/schedule/{schedule_id}/all", response_model=schemas.ScheduleAllInOne)
+    def _get_all_schedule_data_at_once(schedule_id: str):
+        schedule = get_schedule_schema(schedule_id)
+
+        schedule_model = find_schedule_by_path_id(schedule_id)
+        guest_models = list_guests_by_schedule(schedule_model)
+        guests = guests_model_to_schema(guest_models)
+
+        votes = get_schedule_votes(schedule_id)
+        day_votes = votes.day_votes
+
+        match_most_participants = find_schedule_match_most_participants(schedule_id)
+        match_soonest_possible = find_schedule_match_soonest_possible(schedule_id)
+
+        return schemas.ScheduleAllInOne(
+            schedule=schedule,
+            guests=guests,
+            day_votes=day_votes,
+            match_most_participants=match_most_participants,
+            match_soonest_possible=match_soonest_possible,
+        )

@@ -70,3 +70,11 @@ class BestMatch(BaseModel):
     guest_results: List[str]
     algorithm: str
     place: Optional[int]
+
+
+class ScheduleAllInOne(BaseModel):
+    schedule: Schedule
+    guests: List[Guest]
+    day_votes: List[DayVotes]
+    match_most_participants: BestMatch
+    match_soonest_possible: BestMatch
