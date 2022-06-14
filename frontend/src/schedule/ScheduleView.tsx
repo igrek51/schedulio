@@ -39,8 +39,6 @@ function ScheduleView() {
     ScheduleService.scheduleId = scheduleId!;
 
     useEffect(() => {
-        ScheduleService.scheduleGridRef = scheduleGridRef;
-        ScheduleService.hotRef = scheduleGridRef.current!.hotTableRef;
 
         ScheduleService.fetchData();
 

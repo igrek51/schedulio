@@ -75,7 +75,7 @@ export class ScheduleService {
     static guestsById: Record<string, Guest> = {};
     static guestIdToIndex: Record<string, number> = {};
     static hotRef: React.RefObject<HotTable>;
-    static scheduleGridRef: React.RefObject<GridComponent>;
+    static scheduleGridRef: GridComponent;
     static timestampToDayOfWeek: Record<string, number> = {};
 
     static bestMatchDayName: string = '';
@@ -206,7 +206,7 @@ export class ScheduleService {
         }
         tableData.push(['...'].concat(guestEmptyColumns))
 
-        this.scheduleGridRef.current!.setTableData(tableData)
+        this.scheduleGridRef.setTableData(tableData)
 
         hot.render()
         hot.resumeRender()
@@ -226,7 +226,7 @@ export class ScheduleService {
         
                 const batchVotes = response.data.day_votes
 
-                const scheduleGrid = this.scheduleGridRef.current!
+                const scheduleGrid = this.scheduleGridRef
                 const tableData = scheduleGrid.tableData
 
                 tableData.pop()

@@ -28,6 +28,8 @@ export class GridComponent extends React.Component<any, any> {
             ['Day'],
             ['...'],
         ]
+        ScheduleService.scheduleGridRef = this;
+        ScheduleService.hotRef = this.hotTableRef;
     }
 
     disableConstantFocus() {
