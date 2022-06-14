@@ -19,14 +19,12 @@ export class BestMatchTable extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.hotTableRef = React.createRef<HotTable>();
-        this.tableData = [
-            ['Day', 'Time', 'Participants'],
-        ]
+        this.tableData = []
         this.algorithm = props.algorithm
 
-        if (this.algorithm == 'most_participants') {
+        if (this.algorithm === 'most_participants') {
             CallbackHell.onLoadBestMatch = (bestMatch: BestMatch | null) => { this.onLoadMatch(bestMatch) }
-        } else if (this.algorithm == 'soonest_possible') {
+        } else if (this.algorithm === 'soonest_possible') {
             CallbackHell.onLoadSoonestMatch = (bestMatch: BestMatch | null) => { this.onLoadMatch(bestMatch) }
         }
     }

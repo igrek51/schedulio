@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
 import BoltIcon from '@mui/icons-material/Bolt';
+import Collapse from '@mui/material/Collapse';
 
 import { ScheduleService } from './ScheduleService';
 import {EventTitleView} from './EventTitleView';
@@ -32,25 +33,21 @@ function ScheduleView() {
     const titleRef = React.createRef<EventTitleView>();
     const scheduleGridRef = React.createRef<GridComponent>();
     const hoursFieldRef = React.createRef<TimeRangeField>();
+    const [soonestMatchVisible, setSoonestMatchVisible] = React.useState(true);
     
     const { scheduleId } = useParams();
     ScheduleService.scheduleId = scheduleId!;
-
-    const onTitleLoad = (title: string) => {
-        titleRef.current!.setState({title: title});
-        document.title = `Schedulio: ${title}`;
-    };
 
     useEffect(() => {
         ScheduleService.scheduleGridRef = scheduleGridRef;
         ScheduleService.hotRef = scheduleGridRef.current!.hotTableRef;
 
-        ScheduleService.fetchData(onTitleLoad);
+        ScheduleService.fetchData();
 
         activateBootstrapTooltips()
-    });
+    }, []);
 
-    CallbackHell.onTitleLoad = onTitleLoad
+    CallbackHell.setSoonestMatchVisible = setSoonestMatchVisible
 
     const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(menuAnchorEl);
@@ -168,14 +165,16 @@ function ScheduleView() {
 
                 <div className="mt-4 mb-5">
                     <h4 data-toggle="tooltip" data-placement="left" title="A day with the most confirmed participants">
-                        <StarBorderIcon fontSize="large"/> Best Match
+                        <StarBorderIcon fontSize="large"/> Best match
                     </h4>
                     <BestMatchTable algorithm="most_participants"/>
                     
+                    <Collapse in={soonestMatchVisible}>
                     <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="A first day with the possible participants more than minimum threshold">
-                        <BoltIcon fontSize="large"/> Soonest Possible Match
+                        <BoltIcon fontSize="large"/> Soonest possible match
                     </h4>
                     <BestMatchTable algorithm="soonest_possible"/>
+                    </Collapse>
                 </div>
 
             </Container>

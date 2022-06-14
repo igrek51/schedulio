@@ -1,5 +1,4 @@
 import * as Handsontable from 'handsontable/dist/handsontable.full.min.js';
-import { ScheduleService } from './ScheduleService';
 import {Tooltip} from 'bootstrap';  // enable .tooltip jquery function
 import * as $ from 'jquery';
 

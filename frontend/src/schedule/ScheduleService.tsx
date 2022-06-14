@@ -75,9 +75,7 @@ export class ScheduleService {
     static bestMatchGuestResults: string[] = [];
     static soonestMatchGuestResults: string[] = [];
 
-    static fetchData(
-        onTitleLoad: (title: string) => void,
-        ) {
+    static fetchData() {
         console.log('loading data...');
 
         axios.get(`/api/schedule/${this.scheduleId}`)
@@ -95,7 +93,7 @@ export class ScheduleService {
                 } else {
                     this.scheduleOptions = JSON.parse(schedule.options)
                 }
-                onTitleLoad(this.title);
+                CallbackHell.onTitleLoad(this.title);
 
             }).catch(err => {
                 ToastService.showAxiosError(`Fetching schedule`, err)
@@ -136,6 +134,11 @@ export class ScheduleService {
                     this.bestMatchDayName = bestMatch.day_name
                     this.bestMatchGuestResults = bestMatch.guest_results
                 }
+
+                if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+                    CallbackHell.setSoonestMatchVisible(false)
+                }
+
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()
                 CallbackHell.onLoadBestMatch(bestMatch)
@@ -154,6 +157,11 @@ export class ScheduleService {
                     this.soonestMatchDayName = bestMatch.day_name
                     this.soonestMatchGuestResults = bestMatch.guest_results
                 }
+
+                if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+                    CallbackHell.setSoonestMatchVisible(false)
+                }
+
                 let hot = this.hotRef.current!.hotInstance!;
                 hot.render()
                 CallbackHell.onLoadSoonestMatch(bestMatch)
