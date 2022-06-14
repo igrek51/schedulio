@@ -3,7 +3,7 @@ import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable/base';
 import { BestMatch, ScheduleService } from './ScheduleService';
-import { activateBootstrapTooltips, bestmatchCellRenderer } from "./grid.js";
+import { activateBootstrapTooltips, applyDefaultRenderer } from "./grid.js";
 import { CallbackHell } from "./CallbackHell";
 
 registerAllModules();
@@ -82,9 +82,85 @@ export class BestMatchTable extends React.Component<any, any> {
         hot.updateData(this.tableData)
     }
 
+
     render() {
+
+        function cellRenderer(
+            instance: Handsontable, td: HTMLTableCellElement, row: number, col: number, 
+            prop: any, value: Handsontable.CellValue, cellProperties: any) {
+            applyDefaultRenderer(instance, td, row, col, prop, value, cellProperties)
+        
+            td.style.color = '#000000'
+            
+            let html = value
+            let tooltip = ''
+            let tooltipPlacement = 'top'
+            if (row === instance.countRows() - 1) {
+                tooltipPlacement = 'bottom'
+            } 
+            if (col == 0) {
+                tooltipPlacement = 'left'
+            }
+
+            if (row === 0) {
+                td.style.background = '#F8F9FA'
+                td.style.fontWeight = 'bold'
+            } else if (row > 0 && col === 1) {
+                if (ScheduleService.matchMostDayName !== '' && ScheduleService.matchMostDayName === value) {
+                    html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="StarBorderIcon"><path d="m22 9.24-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"></path></svg> ${html}`
+                    tooltip = `Best Match - day with the most confirmed participants`
+                }
+
+            } else if (row > 0 && col == 3) {
+                tooltip = `Number of confirmed - potential participants of total guests`
+
+            } else if (row > 0 && col > 3) {
+                const guestIndex = col - 4
+
+                let guestResultsMap: string[] = []
+                if (row == 1) {
+                    guestResultsMap = ScheduleService.matchMostGuestResults
+
+                } else if (row == 2) {
+                    guestResultsMap = ScheduleService.matchEarliestGuestResults
+                }
+
+                const guestResult = guestResultsMap[guestIndex]
+                if (guestResult) {
+                    const guest = ScheduleService.guests[guestIndex]
+
+                    if (guestResult === 'ok') {
+                        td.style.color = '#38782E'
+                        td.style.background = '#D9EAD3'
+                        td.style.fontWeight = 'bold'
+                        if (guest) {
+                            tooltip = `${guest.name} confirmed to participate`
+                        }
+                    } else if (guestResult === 'no') {
+                        td.style.color = '#AC322C'
+                        td.style.background = '#EA9999'
+                        if (guest) {
+                            tooltip = `${guest.name} can't make it`
+                        }
+                    } else if (guestResult === 'maybe') {
+                        td.style.color = '#71A1D2'
+                        td.style.background = '#EEF4FB'
+                        if (guest) {
+                            tooltip = `${guest.name} maybe will join`
+                        }
+                    }
+                }
+            }
+
+            if (tooltip !== '') {
+                html = `<div class="py-1" data-toggle="tooltip" data-placement="${tooltipPlacement}" title="${tooltip}">${html}</div>`
+                td.title = tooltip
+            }
+            td.innerHTML = html
+        }
+
         function cells(row: number, col: number, prop: string | number): any {
-            const cellProperties = { readOnly: false, renderer: bestmatchCellRenderer };
+            const cellProperties = { readOnly: false, renderer: cellRenderer };
             cellProperties.readOnly = true
             return cellProperties
         }
