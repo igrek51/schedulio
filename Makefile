@@ -1,5 +1,7 @@
 .PHONY: deploy build run setup test
 
+DOCKER_TAG ?= 1.0.0
+
 setup:
 	python3.8 -m venv venv &&\
 	. venv/bin/activate &&\
@@ -60,6 +62,16 @@ push-to-registry: build
 	docker login registry.gitlab.com
 	docker tag schedulio:latest registry.gitlab.com/igrek51/schedulio/schedulio:latest
 	docker push registry.gitlab.com/igrek51/schedulio/schedulio:latest
+
+push-to-dockerhub: build
+	docker login
+	docker tag schedulio:latest igrek52/schedulio:latest
+	docker push igrek52/schedulio:latest
+
+push-to-dockerhub-tag: build
+	docker login
+	docker tag schedulio:latest igrek52/schedulio:$(DOCKER_TAG)
+	docker push igrek52/schedulio:$(DOCKER_TAG)
 
 
 deploy-from-tar: build

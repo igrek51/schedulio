@@ -10,6 +10,9 @@ COPY static/. /src/schedulio/static/
 COPY schedulio/. /src/schedulio/schedulio/
 RUN cd /src/schedulio && python setup.py develop
 
+COPY db/schedulio.sqlite /src/schedulio/db/schedulio.sqlite
+RUN chmod a+rw -R /src/schedulio/db/
+
 ENV DEBUG false
 ENV DJANGO_SETTINGS_MODULE "schedulio.djangoapp.settings"
 CMD python -u -m schedulio run
