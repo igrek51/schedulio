@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from nuclear.sublog import log, log_exception
+from uvicorn.config import LOGGING_CONFIG
 
 from schedulio.djangoapp.asgi import application as django_app
 from schedulio.api.dispatcher import AsgiDispatcher
@@ -21,6 +22,11 @@ def run_server():
         '/static/admin': django_app,
         '/dump': django_app,
     }, default=fastapi_app)
+
+    LOGGING_CONFIG["formatters"]["default"]["datefmt"] = "%Y-%m-%d %H:%M:%S"
+    LOGGING_CONFIG["formatters"]["access"]["datefmt"] = "%Y-%m-%d %H:%M:%S"
+    LOGGING_CONFIG["formatters"]["default"]["fmt"] = "[%(asctime)s] %(levelprefix)s %(message)s"
+    LOGGING_CONFIG["formatters"]["access"]["fmt"] = "[%(asctime)s] %(levelprefix)s %(message)s"
 
     uvicorn.run(app=dispatcher, host="0.0.0.0", port=port, log_level="debug")
 
