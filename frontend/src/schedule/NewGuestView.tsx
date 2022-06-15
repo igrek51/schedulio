@@ -8,10 +8,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import AddIcon from '@mui/icons-material/Add';
-import Tooltip from '@mui/material/Tooltip';
 import { ScheduleService } from "./ScheduleService";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
+import { BootstrapTooltip } from "./Tooltip";
 
 export default function NewGuestView(props: any) {
 
@@ -54,11 +54,11 @@ export default function NewGuestView(props: any) {
     return (
         <div>
             <ButtonGroup>
-                <Tooltip title="Add yourself to the table" arrow placement="top">
+                <BootstrapTooltip title="Add yourself to the table" arrow placement="top">
                     <Button variant="contained" color="primary" onClick={handleClickOpen}>
                         <AddIcon fontSize="small" /> Add Guest
                     </Button>
-                </Tooltip>
+                </BootstrapTooltip>
             </ButtonGroup>
 
             <Dialog open={open} onClose={handleClose}>

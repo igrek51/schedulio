@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
 import CheckIcon from '@mui/icons-material/Check';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
@@ -17,7 +16,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import Collapse from '@mui/material/Collapse';
 
 import { ScheduleService } from './ScheduleService';
-import {EventTitleView} from './EventTitleView';
+import { EventTitleView } from './EventTitleView';
 import { TimeRangeField } from './TimeRangeField';
 import BestMatchTable from './BestMatchTable';
 import GridComponent from './GridComponent';
@@ -26,6 +25,7 @@ import { CallbackHell } from "./CallbackHell";
 import './grid.css';
 import { activateBootstrapTooltips } from './grid.js';
 import EditScheduleDialog from "./EditScheduleDialog";
+import { BootstrapTooltip } from "./Tooltip";
 
 
 function ScheduleView() {
@@ -34,7 +34,7 @@ function ScheduleView() {
     const scheduleGridRef = React.createRef<GridComponent>();
     const hoursFieldRef = React.createRef<TimeRangeField>();
     const [soonestMatchVisible, setSoonestMatchVisible] = React.useState(true);
-    
+
     const { scheduleId } = useParams();
     ScheduleService.scheduleId = scheduleId!;
 
@@ -90,8 +90,8 @@ function ScheduleView() {
                     direction="row"
                     justifyContent="space-between"
                     alignItems="center"
-                    >
-                    <EventTitleView ref={titleRef}/>
+                >
+                    <EventTitleView ref={titleRef} />
 
                     <div className="d-inline-block ml-2 mt-2">
                         <IconButton
@@ -101,7 +101,7 @@ function ScheduleView() {
                             aria-expanded={openMenu ? 'true' : undefined}
                             aria-haspopup="true"
                             onClick={handleMenuClick}
-                            >
+                        >
                             <MoreVertIcon />
                         </IconButton>
                         <Menu
@@ -112,14 +112,14 @@ function ScheduleView() {
                             anchorEl={menuAnchorEl}
                             open={openMenu}
                             onClose={handleMenuClose}
-                            >
+                        >
                             <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
                             <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
                             <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
                             <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
                         </Menu>
 
-                        <EditScheduleDialog/>
+                        <EditScheduleDialog />
                     </div>
                 </Grid>
 
@@ -129,49 +129,49 @@ function ScheduleView() {
 
                 <div className="mb-2">
                     <div className="d-inline-block ml-1 mr-2 mt-2">
-                        <NewGuestView scheduleGridRef={scheduleGridRef}/>
+                        <NewGuestView scheduleGridRef={scheduleGridRef} />
                     </div>
 
                     <div className="d-inline-block mx-1 mt-2">
                         <ButtonGroup>
-                            <Tooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow placement="top">
+                            <BootstrapTooltip title="Vote for &quot;OK&quot; if you're available in selected days" arrow placement="top">
                                 <Button variant="contained" color="success" onClick={() => { ScheduleService.setSelectedCells('ok'); }}>
-                                    <CheckIcon fontSize="small"/> OK
+                                    <CheckIcon fontSize="small" /> OK
                                 </Button>
-                            </Tooltip>
-                            <Tooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow placement="top">
+                            </BootstrapTooltip>
+                            <BootstrapTooltip title="Vote for &quot;Maybe&quot; (default answer) in selected days" arrow placement="top">
                                 <Button variant="outlined" onClick={() => { ScheduleService.setSelectedCells('maybe'); }}>
-                                    <QuestionMarkIcon fontSize="small"/> Maybe
+                                    <QuestionMarkIcon fontSize="small" /> Maybe
                                 </Button>
-                            </Tooltip>
-                            <Tooltip title="Vote for &quot;No&quot; in selected days" arrow placement="top">
+                            </BootstrapTooltip>
+                            <BootstrapTooltip title="Vote for &quot;No&quot; in selected days" arrow placement="top">
                                 <Button variant="contained" color="error" onClick={() => { ScheduleService.setSelectedCells('no'); }}>
-                                    <CloseIcon fontSize="small"/> No
+                                    <CloseIcon fontSize="small" /> No
                                 </Button>
-                            </Tooltip>
+                            </BootstrapTooltip>
                         </ButtonGroup>
                     </div>
 
                     <div className="d-inline-block ml-1 mt-2">
-                        <TimeRangeField ref={hoursFieldRef}/>
+                        <TimeRangeField ref={hoursFieldRef} />
                     </div>
                 </div>
 
                 <div>
-                    <GridComponent ref={scheduleGridRef} hoursFieldRef={hoursFieldRef}/>
+                    <GridComponent ref={scheduleGridRef} hoursFieldRef={hoursFieldRef} />
                 </div>
 
                 <div className="mt-4 mb-5">
                     <h4 data-toggle="tooltip" data-placement="left" title="Day with the most confirmed participants">
-                        <StarBorderIcon fontSize="large"/> Best match
+                        <StarBorderIcon fontSize="large" /> Best match
                     </h4>
-                    <BestMatchTable algorithm="most_participants"/>
-                    
+                    <BestMatchTable algorithm="most_participants" />
+
                     <Collapse in={soonestMatchVisible}>
-                    <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="First day with the number of possible participants more than minimum threshold">
-                        <BoltIcon fontSize="large"/> Soonest possible match
-                    </h4>
-                    <BestMatchTable algorithm="soonest_possible"/>
+                        <h4 className="mt-3" data-toggle="tooltip" data-placement="left" title="First day with the number of possible participants more than a minimum threshold">
+                            <BoltIcon fontSize="large" /> Soonest possible match
+                        </h4>
+                        <BestMatchTable algorithm="soonest_possible" />
                     </Collapse>
                 </div>
 

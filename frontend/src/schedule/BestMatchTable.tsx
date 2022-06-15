@@ -110,11 +110,11 @@ export class BestMatchTable extends React.Component<any, any> {
                 }
                 if (self.algorithm === 'soonest_possible' && ScheduleService.soonestMatchDayName !== '' && ScheduleService.soonestMatchDayName === value) {
                     html = `<svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium icon-star" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="BoltIcon"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"></path></svg> ${html}`
-                    tooltip = `First day with the number of possible participants more than minimum threshold`
+                    tooltip = `First day with the number of possible participants more than a minimum threshold`
                 }
 
             } else if (row > 0 && col === 2) {
-                tooltip = `Number of confirmed - potential participants (min-max range) of total guests`
+                tooltip = `Number of confirmed and possible participants (min-max range) of total guests`
 
             } else if (row > 0 && col >= 3) {
                 const guestIndex = col - 3
@@ -148,6 +148,9 @@ export class BestMatchTable extends React.Component<any, any> {
                         td.style.background = '#EEF4FB'
                         if (guest) {
                             tooltip = `${guest.name} maybe will join`
+                        }
+                        if (html === '') {
+                            html = '&nbsp;'
                         }
                     }
                 }
