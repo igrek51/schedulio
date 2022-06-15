@@ -29,11 +29,11 @@ make run-docker
 
 ## Example screenshots
 
-![](https://github.com/igrek51/schedulio/blob/master/docs/img/screenshot-1.png)
+![](./docs/img/screenshot-1.png)
 
-![](https://github.com/igrek51/schedulio/blob/master/docs/img/screenshot-2.png)
+![](./docs/img/screenshot-2.png)
 
-![](https://github.com/igrek51/schedulio/blob/master/docs/img/screenshot-3.png)
+![](./docs/img/screenshot-3.png)
 
 ## Database Management
 
