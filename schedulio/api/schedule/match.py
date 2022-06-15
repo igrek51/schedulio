@@ -190,19 +190,6 @@ def _count_conditional_votes(
             start_time=options.default_start_time,
             end_time=options.default_end_time,
         )
-    
-    if len(conditional_votes) == 1:
-        vote = conditional_votes[0]
-        start_time = vote.time_range.start_time
-        end_time = vote.time_range.end_time
-        guest_count = len(conditional_votes)
-        return TimeMatch(
-            min_guests=guest_count,
-            max_guests=guest_count,
-            start_time=start_time,
-            end_time=end_time,
-            guest_results_map={vote.guest_id: 'ok'},
-        )
 
     guest_count = 0
     start_time = time(hour=0, minute=0, tzinfo=pytz.UTC)

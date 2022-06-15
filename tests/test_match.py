@@ -133,6 +133,39 @@ def test_no_match_because_insufficient_guests():
     assert best_match is None
 
 
+def test_insufficient_duration_means_no():
+
+    today_timestamp = 1654006601
+    a_day = 24*3600
+    min_date = timestamp_to_datetime(today_timestamp) # Tue 2022-05-31
+    max_date = timestamp_to_datetime(today_timestamp) # Mon 2022-06-06
+    guests = [
+        schemas.Guest(id='1', name='Alice', schedule_id='1', create_time=0, last_update=0),
+        schemas.Guest(id='2', name='Bob', schedule_id='1', create_time=0, last_update=0),
+    ]
+    day_guest_vote_map: Dict[int, Dict[str, str]] = {
+        today_timestamp: {
+            '1': 'ok',
+            '2': '15-16',
+        },
+    }
+    options = parse_schedule_options_json('{"min_duration": "2h"}')
+
+    best_match: schemas.BestMatch = find_match_most_participants(
+        min_date, max_date, guests, day_guest_vote_map, options,
+    )
+
+    assert best_match
+    assert best_match.day_timestamp == today_timestamp
+    assert best_match.start_time == '00:00'
+    assert best_match.end_time == '23:59'
+    assert best_match.min_guests == 1
+    assert best_match.max_guests == 1
+    assert best_match.total_guests == 2
+    assert best_match.all_guest_names == ['Alice', 'Bob']
+    assert best_match.guest_results == ['ok', 'no']
+
+
 def test_best_match_soonest_possible():
 
     today_timestamp = 1654006601
