@@ -10,6 +10,8 @@ services:
       - "8030:8000"
     volumes:
       - ./volumes/db:/src/schedulio/db
+    env_file:
+      - ./env
     environment:
       TIME_ZONE: 'Europe/Warsaw'
       DJANGO_CSRF_TRUSTED_ORIGIN: 'https://schedulio.igrek.dev'

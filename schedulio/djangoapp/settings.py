@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.environ.get('DEBUG', 'true').lower() in {'true', 'yes', 'y', '1'}
 
-SECRET_KEY = 'x&y+a!&t&d3y+*!igjtgrf_^&h&kj=(+)fuv9(a#qa1+ge$r0e'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev')
 
 ALLOWED_HOSTS = ['*']
 

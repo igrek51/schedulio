@@ -42,6 +42,11 @@
         src: docker-compose.yaml
         dest: "{{ component_dir }}/docker-compose.yaml"
 
+    - name: template secret env file
+      template:
+        src: env.dist
+        dest: "{{ component_dir }}/env.dist"
+
     - name: load docker image
       command: "docker load -i {{ component_dir }}/{{ component_name }}.tar.gz"
 

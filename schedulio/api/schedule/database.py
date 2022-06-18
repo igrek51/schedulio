@@ -88,6 +88,7 @@ def create_new_guest(schedule: models.Schedule, guest: schemas.GuestCreate) -> m
         name=guest.name,
     )
     new_model.save()
+    log.info('guest created', new_model=guest.name, guest_id=new_model.id)
     return new_model
 
 
