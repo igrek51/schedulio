@@ -27,6 +27,10 @@ from schedulio.api.schedule.schedule import (
     send_multiple_guest_votes, 
     find_schedule_match_most_participants,
 )
+from schedulio.api.metrics import (
+    metric_created_schedules,
+    metric_created_guests,
+)
 from schedulio.api.schedule.calendar import get_more_votes
 
 
@@ -40,6 +44,7 @@ def setup_endpoints(app: FastAPI):
     @app.post("/api/schedule", response_model=schemas.Schedule)
     def _create_schedule(schedule: schemas.ScheduleCreate):
         schedule_model = create_new_schedule(schedule)
+        metric_created_schedules.inc()
         return schedule_model_to_schema(schedule_model)
 
     @app.get("/api/schedule/{schedule_id}", response_model=schemas.Schedule)
@@ -68,6 +73,7 @@ def setup_endpoints(app: FastAPI):
     def _create_guest(schedule_id: str, guest: schemas.GuestCreate):
         schedule_model = find_schedule_by_path_id(schedule_id)
         guest_model = create_new_guest(schedule_model, guest)
+        metric_created_guests.inc()
         return guest_model_to_schema(guest_model)
 
     @app.get("/api/guest/{guest_id}", response_model=schemas.Guest)

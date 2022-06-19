@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from nuclear.sublog import log, log_exception
 from uvicorn.config import LOGGING_CONFIG
+from prometheus_client import make_asgi_app
 
 from schedulio.djangoapp.asgi import application as django_app
 from schedulio.api.dispatcher import AsgiDispatcher
@@ -17,10 +18,13 @@ def run_server():
     log.info(f'Starting HTTP server', addr=f'http://0.0.0.0:{port}')
 
     fastapi_app = creat_fastapi_app()
+    metrics_app = make_asgi_app()
+
     dispatcher = AsgiDispatcher({
         '/admin': django_app,
         '/static/admin': django_app,
         '/dump': django_app,
+        '/metrics': metrics_app,
     }, default=fastapi_app)
 
     LOGGING_CONFIG["formatters"]["default"]["datefmt"] = "%Y-%m-%d %H:%M:%S"

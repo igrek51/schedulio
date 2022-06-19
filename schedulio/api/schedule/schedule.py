@@ -32,6 +32,9 @@ from schedulio.api.schedule.time import (
     round_timestamp_to_day,
     timestamp_to_datetime,
 )
+from schedulio.api.metrics import (
+    metric_sent_votes,
+)
 
 spare_schedule_days_num = 14
 
@@ -95,6 +98,7 @@ def send_guest_vote(guest_id: str, vote: schemas.Vote) -> Optional[schemas.Vote]
     update_guest_last_update(guest_model)
     if vote_model is None:
         return None
+    metric_sent_votes.inc()
     return vote_model_to_schema(vote_model)
 
 
@@ -106,6 +110,7 @@ def send_multiple_guest_votes(guest_id: str, votes: List[schemas.Vote]):
         day_timestamp = round_timestamp_to_day(vote.day)
         create_or_update_vote(guest_model, day_timestamp, vote.answer)
     update_guest_last_update(guest_model)
+    metric_sent_votes.inc(len(votes))
 
 
 def validate_answer(answer: str):
