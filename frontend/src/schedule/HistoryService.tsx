@@ -45,6 +45,12 @@ export class HistoryService {
         }
         this.saveHistory(history)
     }
+    
+    static deleteHistoryItem(path_id: string) {
+        const history = HistoryService.readHistory()
+        delete history.path_id_items[path_id]
+        HistoryService.saveHistory(history)
+    }
 
     static readOrderedItems(): ScheduleHistoryItem[] {
         const history = this.readHistory()
