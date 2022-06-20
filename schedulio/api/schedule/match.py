@@ -38,12 +38,14 @@ def find_match_most_participants(
     def _match_condition(match: schemas.BestMatch) -> bool:
         return match.max_guests >= options.min_guests
 
-    def _match_score(match: schemas.BestMatch) -> float:
-        return match.min_guests
+    def _match_is_better(match: schemas.BestMatch, than: schemas.BestMatch) -> bool:
+        if match.min_guests > than.min_guests:
+            return True
+        return match.max_guests > than.max_guests
 
     best_match = _find_best_match(
         min_date, max_date, guests, day_guest_vote_map, 'most_participants', options,
-        _match_condition, _match_score,
+        _match_condition, _match_is_better,
     )
     return best_match
 
@@ -59,15 +61,15 @@ def find_match_soonest_possible(
         min_guests = options.min_guests or 1
         return match.max_guests >= min_guests
 
-    def _match_score(match: schemas.BestMatch) -> float:
-        return 0
+    def _match_is_better(match: schemas.BestMatch, than: schemas.BestMatch) -> bool:
+        return False
 
     def _on_best_found(match: schemas.BestMatch) -> float:
         raise StopFurtherSearch()
 
     best_match = _find_best_match(
         min_date, max_date, guests, day_guest_vote_map, 'soonest_possible', options,
-        _match_condition, _match_score, _on_best_found,
+        _match_condition, _match_is_better, _on_best_found,
     )
     return best_match
 
@@ -80,14 +82,13 @@ def _find_best_match(
     algorithm: str,
     options: ScheduleOptions,
     match_condition: Callable[[schemas.BestMatch], bool],
-    match_score: Callable[[schemas.BestMatch], float],
+    better_match_comparator: Callable[[schemas.BestMatch, schemas.BestMatch], bool],
     on_best_found: Callable[[schemas.BestMatch], float] = None,
 ) -> Optional[schemas.BestMatch]:
     guest_ids = [guest.id for guest in guests]
     all_guest_names = [guest.name for guest in guests]
 
     best_match: Optional[schemas.BestMatch] = None
-    best_score: float = 0
 
     try:
         for day_timestamp, day_date in days_range(min_date=min_date, max_date=max_date):
@@ -115,10 +116,8 @@ def _find_best_match(
             )
 
             if match_condition(match):
-                score = match_score(match)
-                if best_match is None or score > best_score:
+                if best_match is None or better_match_comparator(match, best_match):
                     best_match = match
-                    best_score = score
                     if on_best_found is not None:
                         on_best_found(match)
 

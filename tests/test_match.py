@@ -4,6 +4,8 @@ from schedulio.api.schedule.match import find_match_most_participants, find_matc
 from schedulio.api.schedule.options import default_schedule_options, parse_schedule_options_json
 from schedulio.api.schedule.time import timestamp_to_datetime
 
+a_day = 24*3600
+
 
 def test_best_match_most_participants():
 
@@ -15,7 +17,6 @@ def test_best_match_most_participants():
         schemas.Guest(id='2', name='Bob', schedule_id='1', create_time=0, last_update=0),
         schemas.Guest(id='3', name='Charlie', schedule_id='1', create_time=0, last_update=0),
     ]
-    a_day = 24*3600
     day_guest_vote_map: Dict[int, Dict[str, str]] = {
         today_timestamp: {
             '1': 'ok',
@@ -136,7 +137,6 @@ def test_no_match_because_insufficient_guests():
 def test_insufficient_duration_means_no():
 
     today_timestamp = 1654006601
-    a_day = 24*3600
     min_date = timestamp_to_datetime(today_timestamp) # Tue 2022-05-31
     max_date = timestamp_to_datetime(today_timestamp) # Mon 2022-06-06
     guests = [
@@ -176,7 +176,6 @@ def test_best_match_soonest_possible():
         schemas.Guest(id='2', name='Bob', schedule_id='1', create_time=0, last_update=0),
         schemas.Guest(id='3', name='Charlie', schedule_id='1', create_time=0, last_update=0),
     ]
-    a_day = 24*3600
     day_guest_vote_map: Dict[int, Dict[str, str]] = {
         today_timestamp: {
             '1': 'ok',
@@ -211,3 +210,44 @@ def test_best_match_soonest_possible():
     assert best_match.guest_votes == ['ok', '', 'no']
     assert best_match.all_guest_names == ['Alice', 'Bob', 'Charlie']
     assert best_match.guest_results == ['ok', 'maybe', 'no']
+
+
+def test_most_participants_maximizing_upper_bound():
+
+    today_timestamp = 1654006601
+    min_date = timestamp_to_datetime(today_timestamp)
+    max_date = timestamp_to_datetime(today_timestamp + 3 * a_day)
+    guests = [
+        schemas.Guest(id='1', name='Alice', schedule_id='1', create_time=0, last_update=0),
+        schemas.Guest(id='2', name='Bob', schedule_id='1', create_time=0, last_update=0),
+        schemas.Guest(id='3', name='Charlie', schedule_id='1', create_time=0, last_update=0),
+    ]
+    day_guest_vote_map: Dict[int, Dict[str, str]] = {
+        today_timestamp: {
+            '1': 'ok',
+            '2': '',
+            '3': 'no',
+        },
+        today_timestamp + 1 * a_day: {
+            '1': 'no',
+            '2': '',
+            '3': 'ok',
+        },
+        today_timestamp + 2 * a_day: {
+            '1': 'maybe',
+            '2': '',
+            '3': 'ok',
+        },
+    }
+    options = default_schedule_options()
+
+    best_match: schemas.BestMatch = find_match_most_participants(
+        min_date, max_date, guests, day_guest_vote_map, options,
+    )
+
+    assert best_match
+    assert best_match.day_timestamp == today_timestamp + 2 * a_day
+    assert best_match.min_guests == 1
+    assert best_match.max_guests == 3
+    assert best_match.total_guests == 3
+    assert best_match.guest_results == ['maybe', 'maybe', 'ok']
