@@ -14,6 +14,9 @@ setup:
 build:
 	COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yaml build
 
+build-frontend:
+	cd frontend && make build
+
 run-docker: build
 	echo "Working on local modifiable copy"
 	mkdir -p .volumes
