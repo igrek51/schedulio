@@ -1,6 +1,6 @@
 .PHONY: deploy build run setup test
 
-DOCKER_TAG ?= 1.0.0
+DOCKER_TAG ?= 1.1.0
 
 setup:
 	python3.8 -m venv venv &&\
