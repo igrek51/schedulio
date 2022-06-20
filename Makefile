@@ -103,7 +103,7 @@ deploy: deploy-from-registry
 
 
 mkdocs-local:
-	mkdocs serve
+	python -m mkdocs serve
 
 mkdocs-push:
-	mkdocs gh-deploy --force
+	python -m mkdocs gh-deploy --force
