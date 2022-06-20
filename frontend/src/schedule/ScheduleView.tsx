@@ -14,6 +14,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Grid';
 import BoltIcon from '@mui/icons-material/Bolt';
 import Collapse from '@mui/material/Collapse';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { ScheduleService } from './ScheduleService';
 import { EventTitleView } from './EventTitleView';
@@ -86,42 +87,51 @@ function ScheduleView() {
         <div className="mt-3">
             <Container maxWidth="lg" disableGutters>
 
-                <Grid
-                    container
+                <Grid container
                     direction="row"
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <EventTitleView ref={titleRef} />
+                    <Grid item>
+                        <div className="d-inline-block align-top">
+                            <IconButton onClick={goToHomePage} title="Go to home page" aria-label="Go to home page" size="medium">
+                                <ArrowBackIcon fontSize="medium"/>
+                            </IconButton>
+                        </div>
+                        <div className="d-inline-block">
+                            <EventTitleView ref={titleRef} />
+                        </div>
+                    </Grid>
+                    <Grid item>
+                        <div className="d-inline-block ml-2 mt-2">
+                            <IconButton
+                                aria-label="more"
+                                id="basic-menu-button"
+                                aria-controls={openMenu ? 'basic-menu' : undefined}
+                                aria-expanded={openMenu ? 'true' : undefined}
+                                aria-haspopup="true"
+                                onClick={handleMenuClick}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="basic-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'basic-menu-button',
+                                }}
+                                anchorEl={menuAnchorEl}
+                                open={openMenu}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
+                                <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
+                                <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
+                                <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
+                            </Menu>
 
-                    <div className="d-inline-block ml-2 mt-2">
-                        <IconButton
-                            aria-label="more"
-                            id="basic-menu-button"
-                            aria-controls={openMenu ? 'basic-menu' : undefined}
-                            aria-expanded={openMenu ? 'true' : undefined}
-                            aria-haspopup="true"
-                            onClick={handleMenuClick}
-                        >
-                            <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                            id="basic-menu"
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-menu-button',
-                            }}
-                            anchorEl={menuAnchorEl}
-                            open={openMenu}
-                            onClose={handleMenuClose}
-                        >
-                            <MenuItem onClick={menuAddGuest}>Add Guest</MenuItem>
-                            <MenuItem onClick={menuEditSchedule}>Edit Schedule</MenuItem>
-                            <MenuItem onClick={menuCreateSchedule}>Create New Schedule</MenuItem>
-                            <MenuItem onClick={menuDeleteSchedule}>Delete Schedule</MenuItem>
-                        </Menu>
-
-                        <EditScheduleDialog />
-                    </div>
+                            <EditScheduleDialog />
+                        </div>
+                    </Grid>
                 </Grid>
 
                 <div className="ml-1">

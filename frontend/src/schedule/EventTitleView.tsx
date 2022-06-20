@@ -15,7 +15,7 @@ export class EventTitleView extends React.Component<any, any> {
 
     render() {
         return (
-            <h2 id="schedule-title" className="ml-2">{this.state.title}</h2>
+            <h2 id="schedule-title" className="ml-1">{this.state.title}</h2>
         )
     }
 }

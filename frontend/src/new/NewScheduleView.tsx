@@ -17,6 +17,8 @@ function NewScheduleView() {
 
     const history = HistoryService.readHistory();
 
+    document.title = `Schedulio`;
+
     useEffect(() => {
         if (isHistoryEmpty(history)) {
             clickNewSchedule()

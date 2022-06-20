@@ -217,7 +217,7 @@ export class GridComponent extends React.Component<any, any> {
             height: '60vh',
             colWidths(index: number) {
                 if (index === 0) {
-                    return 150
+                    return 140
                 }
                 return 100
             },
