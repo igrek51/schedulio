@@ -23,7 +23,7 @@ function NewScheduleView() {
         if (isHistoryEmpty(history)) {
             clickNewSchedule()
         }
-    }, []);
+    }, [history]);
 
     return (
         <div className="mt-3">

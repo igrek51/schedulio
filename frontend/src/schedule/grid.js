@@ -1,4 +1,5 @@
 import * as Handsontable from 'handsontable/dist/handsontable.full.min.js';
+// eslint-disable-next-line no-unused-vars
 import {Tooltip} from 'bootstrap';  // enable .tooltip jquery function
 import * as $ from 'jquery';
 

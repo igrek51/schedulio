@@ -9,10 +9,6 @@ import { HistoryService, ScheduleHistoryItem } from "../schedule/HistoryService"
 
 export class HistoryComponent extends React.Component {
 
-    constructor(props: any) {
-        super(props);
-    }
-
     deleteHistoryItem(path_id: string) {
         HistoryService.deleteHistoryItem(path_id)
         ToastService.toastSuccess('History item deleted')

@@ -1,6 +1,8 @@
-import { toast } from 'react-toastify';
+import { toast, Id } from 'react-toastify';
 
 export class ToastService {
+
+    static lastSuccessToastId: Id | null = null;
 
     static toastInfo(msg: string) {
         toast.info(msg, {
@@ -27,7 +29,11 @@ export class ToastService {
     }
 
     static toastSuccess(msg: string) {
-        toast.success(msg, {
+        if (this.lastSuccessToastId) {
+            toast.dismiss(this.lastSuccessToastId);
+        }
+
+        this.lastSuccessToastId = toast.success(msg, {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,

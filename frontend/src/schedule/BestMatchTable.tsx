@@ -56,7 +56,7 @@ export class BestMatchTable extends React.Component<any, any> {
     
             return resultRow
         } else {
-            return ['No match (insufficient guests)', '-', '-']
+            return ['No match \n(insufficient data)', '-', '-']
         }
     }
 
