@@ -18,4 +18,4 @@ all:
     copy_volumes_data:
       - src: "../db/schedulio.sqlite"
         dst: "{{ component_dir }}/volumes/db/schedulio.sqlite"
-    registry_image_name: 'registry.gitlab.com/igrek51/schedulio/schedulio:latest'
+    registry_image_name: 'ghcr.io/igrek51/schedulio:latest'

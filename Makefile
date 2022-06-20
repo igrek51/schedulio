@@ -1,14 +1,15 @@
 .PHONY: deploy build run setup test
 
-DOCKER_TAG ?= 1.1.0
+DOCKER_TAG ?= 1.2.0
 
 setup:
-	python3.8 -m venv venv &&\
+	python3 -m venv venv &&\
 	. venv/bin/activate &&\
 	pip install --upgrade pip setuptools &&\
 	pip install -r requirements.txt -r requirements-dev.txt &&\
 	python setup.py develop
-	@echo Activate your venv: . venv/bin/activate
+	@echo Activate your venv:
+	@echo . venv/bin/activate
 
 
 build:
@@ -52,7 +53,7 @@ add-migration:
 
 
 frontend-setup:
-	cr frontend && make setup
+	cd frontend && make setup
 
 frontend-run:
 	cd frontend && make run
@@ -65,11 +66,11 @@ frontend-build-in-docker:
 
 
 push-to-registry: build
-	docker login registry.gitlab.com
-	docker tag schedulio:latest registry.gitlab.com/igrek51/schedulio/schedulio:latest
-	docker push registry.gitlab.com/igrek51/schedulio/schedulio:latest
+	docker login ghcr.io
+	docker tag schedulio:latest ghcr.io/igrek51/schedulio:latest
+	docker push ghcr.io/igrek51/schedulio:latest
 
-push-to-dockerhub: build
+push-to-dockerhub-latest: build
 	docker login
 	docker tag schedulio:latest igrek52/schedulio:latest
 	docker push igrek52/schedulio:latest

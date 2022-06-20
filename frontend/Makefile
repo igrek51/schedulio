@@ -3,11 +3,14 @@
 setup:
 	nvm install v16.15.0
 	npm install
+	. ./nvm-activate.sh
 
 run:
+	. ./nvm-activate.sh
 	FORCE_COLOR=true BROWSER=none npm start | cat
 
 build:
+	. ./nvm-activate.sh
 	npm run build
 	rm -rf ../static/react
 	cp -r build ../static/react
