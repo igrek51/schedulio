@@ -47,6 +47,7 @@ make run-docker
 ### Database Management
 
 Visit http://127.0.0.1:8000/admin endpoint to access administration panel and manage data models.
+Default username is `admin` and password is `admin`.
 In first place, reset the database and setup your admin account with:
 
 ```bash
@@ -55,14 +56,14 @@ make recreate-db
 
 ## Tech stack
 
-- **Python 3.8**
+- **Python 3.8** - backend
 - **Fastapi** & **Uvicorn** - serving API
 - **Django** - managing data models
 - **SQLite** - storing data
 - [**nuclear**](https://github.com/igrek51/nuclear) - logging and error handling
-- **Docker**
+- **Docker** - containerization
 - **React** & **Typescript** - frontend app
-- **Material UI** - component library
+- **Material UI** - UI component library
 
 ## Testing
 
