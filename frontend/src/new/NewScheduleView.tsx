@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 
 import { CallbackHell } from '../schedule/CallbackHell';
 import CreateScheduleDialog from './CreateScheduleDialog';
+import { HistoryService, isHistoryEmpty } from "../schedule/HistoryService";
+import { HistoryComponent } from "./HistoryComponent";
 
 
 function NewScheduleView() {
@@ -13,8 +15,12 @@ function NewScheduleView() {
         CallbackHell.createScheduleClickOpen()
     };
 
+    const history = HistoryService.readHistory();
+
     useEffect(() => {
-        clickNewSchedule()
+        if (isHistoryEmpty(history)) {
+            clickNewSchedule()
+        }
     }, []);
 
     return (
@@ -29,9 +35,10 @@ function NewScheduleView() {
                     <Button variant="contained" color="primary" onClick={clickNewSchedule}>
                         <AddIcon fontSize="small" /> New Schedule
                     </Button>
+                    <CreateScheduleDialog/>
                 </div>
 
-                <CreateScheduleDialog/>
+                <HistoryComponent/>
 
             </Container>
         </div>

@@ -27,6 +27,9 @@ run-django:
 run-fastapi:
 	python -m schedulio run
 
+run-frontend:
+	cd frontend && make run
+
 run: run-fastapi
 
 test:

@@ -40,9 +40,10 @@ function ScheduleView() {
 
     useEffect(() => {
 
-        ScheduleService.fetchData();
+        ScheduleService.fetchData()
 
         activateBootstrapTooltips()
+
     }, []);
 
     CallbackHell.setSoonestMatchVisible = setSoonestMatchVisible

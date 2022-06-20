@@ -4,6 +4,7 @@ import { HotTable } from '@handsontable/react';
 import GridComponent from "./GridComponent";
 import { ToastService } from "./ToastService";
 import { CallbackHell } from "./CallbackHell";
+import { HistoryService } from "./HistoryService";
 
 
 interface Guest {
@@ -126,7 +127,7 @@ export class ScheduleService {
                 this.bestMatchGuestResults = bestMatch.guest_results
             }
 
-            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName === this.bestMatchDayName) {
                 CallbackHell.setSoonestMatchVisible(false)
             }
 
@@ -144,7 +145,7 @@ export class ScheduleService {
                 this.soonestMatchGuestResults = bestMatch.guest_results
             }
 
-            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName == this.bestMatchDayName) {
+            if (this.soonestMatchDayName !== '' && this.soonestMatchDayName === this.bestMatchDayName) {
                 CallbackHell.setSoonestMatchVisible(false)
             }
 
@@ -169,6 +170,8 @@ export class ScheduleService {
                     onFetchDayVotes(dayVotes)
                     onFetchMatchMostParticipants(matchMostParticipants)
                     onFetchMatchSoonestPossible(matchSoonestPossible)
+
+                    this.saveVisitedSchedule(schedule)
 
                 } catch(e: unknown) {
                     console.error(e);
@@ -435,6 +438,10 @@ export class ScheduleService {
             }).catch(err => {
                 ToastService.showAxiosError(`Creating schedule`, err)
             });
+    }
+
+    static saveVisitedSchedule(schedule: Schedule) {
+        HistoryService.saveHistoryItem(schedule.path_id, schedule.title)
     }
 
 };
