@@ -10,11 +10,11 @@ def setup_web_views(app: FastAPI):
         return FileResponse('static/react/index.html')
 
     @app.get("/schedule/{schedule_id}")
-    async def _index_on_schedule(schedule_id: str):
+    async def _schedule(schedule_id: str):
         return FileResponse('static/react/index.html')
 
     @app.get("/s/{schedule_id}")
-    async def _index_on_schedule(schedule_id: str):
+    async def _schedule_short(schedule_id: str):
         return FileResponse('static/react/index.html')
 
     app.mount("/", StaticFiles(directory="static/react/"), name="static_react")

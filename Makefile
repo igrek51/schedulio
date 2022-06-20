@@ -13,7 +13,9 @@ setup:
 
 
 build:
-	COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yaml build
+	COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yaml build \
+		--build-arg GIT_VERSION="`git describe --long --tags --dirty --always`" \
+		--build-arg DOCKER_TAG="$(DOCKER_TAG)"
 
 build-frontend:
 	cd frontend && make build
@@ -98,3 +100,10 @@ deploy-volumes: push-to-registry
 	ansible-playbook -i inventory.yaml playbook-copy-volumes.yaml
 
 deploy: deploy-from-registry
+
+
+mkdocs-local:
+	mkdocs serve
+
+mkdocs-push:
+	mkdocs gh-deploy --force

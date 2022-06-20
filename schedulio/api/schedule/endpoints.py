@@ -1,3 +1,4 @@
+import os
 from typing import List
 from fastapi import FastAPI
 
@@ -38,7 +39,13 @@ def setup_endpoints(app: FastAPI):
 
     @app.get("/api/status")
     async def _get_server_status():
-        return {'status': 'ok'}
+        return {
+            'status': 'ok',
+            'live': True,
+            'ready': True,
+            'docker_tag': os.environ.get('DOCKER_TAG'),
+            'git_version': os.environ.get('GIT_VERSION'),
+        }
 
 
     @app.post("/api/schedule", response_model=schemas.Schedule)

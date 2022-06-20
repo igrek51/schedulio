@@ -18,10 +18,13 @@ Schedulio lets you plan your periodic events continuously.
 ![](./docs/img/screenshot-3.png)
 
 ## Run from Docker Hub
+Install [Docker](https://docs.docker.com/desktop/linux/install/#supported-platforms), run:
+
 ```bash
 docker run --rm -it -p 8000:8000 -u 1000 --name schedulio igrek52/schedulio
 ```
-and visit http://127.0.0.1:8000
+
+and visit [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ## Local Setup
 
@@ -37,7 +40,7 @@ Run on localhost:
 make run
 ```
 
-and visit http://127.0.0.1:8000.
+and visit [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 You can also run it inside a local docker container:
 ```
@@ -46,13 +49,19 @@ make run-docker
 
 ### Database Management
 
-Visit http://127.0.0.1:8000/admin endpoint to access administration panel and manage data models.
-Default username is `admin` and password is `admin`.
+Visit [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin) endpoint to access administration panel and manage data models.
+Default username & password is `admin` / `admin`.
 In first place, reset the database and setup your admin account with:
 
 ```bash
 make recreate-db
 ```
+
+## Endpoints
+- `/` - home page (frontend app)
+- `/admin` - administration panel
+- `/docs` - API documentation
+- `/api/status` - Server status and version
 
 ## Tech stack
 
