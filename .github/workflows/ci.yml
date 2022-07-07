@@ -22,4 +22,5 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: make setup test
+      - run: make setup
+      - run: . venv/bin/activate && make test
