@@ -10,7 +10,7 @@ run:
 	FORCE_COLOR=true BROWSER=none npm start | cat
 
 build:
-	. ./nvm-activate.sh
+	. ./nvm-activate.sh &&\
 	npm run build
 	rm -rf ../static/react
 	cp -r build ../static/react

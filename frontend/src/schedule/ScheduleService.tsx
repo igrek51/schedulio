@@ -299,7 +299,6 @@ export class ScheduleService {
 
                 const voteWord = votes.length > 1 ? 'votes' : 'vote'
                 const msg = `${votes.length} ${voteWord} sent by ${guest.name}: ${firstAnswer}`
-                ToastService.toastSuccess(msg);
                 console.log(msg)
                 
             }).catch(err => {
