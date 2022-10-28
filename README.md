@@ -2,7 +2,7 @@
 
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/igrek51/schedulio?label=github)](https://github.com/igrek51/schedulio)
 [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/igrek52/schedulio?label=docker)](https://hub.docker.com/r/igrek52/schedulio)
-[![Github Pages](https://img.shields.io/badge/github.io-ok-blue)](https://igrek51.github.io/schedulio)
+[![Github Pages](https://img.shields.io/badge/docs-github.io-blue)](https://igrek51.github.io/schedulio)
 
 Schedulio lets you plan your periodic events continuously.
 

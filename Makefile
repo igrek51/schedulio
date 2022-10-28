@@ -1,6 +1,6 @@
 .PHONY: deploy build run setup test
 
-DOCKER_TAG ?= 1.2.0
+DOCKER_TAG ?= 1.2.1
 
 setup:
 	python3 -m venv venv &&\
@@ -81,6 +81,8 @@ push-to-dockerhub-tag: build
 	docker login
 	docker tag schedulio:latest igrek52/schedulio:$(DOCKER_TAG)
 	docker push igrek52/schedulio:$(DOCKER_TAG)
+
+push: push-to-registry push-to-dockerhub-latest push-to-dockerhub-tag
 
 
 deploy-from-tar: build
