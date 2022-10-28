@@ -39,8 +39,8 @@ def find_match_most_participants(
         return match.max_guests >= options.min_guests
 
     def _match_is_better(match: schemas.BestMatch, than: schemas.BestMatch) -> bool:
-        if match.min_guests > than.min_guests:
-            return True
+        if match.min_guests != than.min_guests:
+            return match.min_guests > than.min_guests
         return match.max_guests > than.max_guests
 
     best_match = _find_best_match(
