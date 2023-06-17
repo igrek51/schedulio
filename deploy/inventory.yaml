@@ -4,7 +4,7 @@ all:
   vars:
     ansible_connection: ssh
     ansible_port: 2222
-    ansible_user: root
+    ansible_user: debian
     ask_pass: false
     ssh_args: "-o PubkeyAuthentication=yes -o PasswordAuthentication=yes -o ControlMaster=auto -o ControlPersist=60s"
     component_name: schedulio
